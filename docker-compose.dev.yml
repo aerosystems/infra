@@ -1,0 +1,110 @@
+version: '3'
+
+services:
+
+ # broker-service - main entry point; we call this from the front end
+ broker-service:
+   container_name: broker-service
+   build:
+     context: ../
+     dockerfile: ./broker-service/broker-service.dockerfile
+   restart: always
+   ports:
+     - "8080:80"
+   deploy:
+     mode: replicated
+     replicas: 1
+   environment:
+     RABBIT_URL: "amqp://guest:guest@rabbitmq"
+
+ # auth-service - handles user auth
+ auth-service:
+   container_name: auth-service
+   build:
+     context: ../
+     dockerfile: ./auth-service/auth-service.dockerfile
+   restart: always
+   ports:
+     - "8081:80"
+   deploy:
+     mode: replicated
+     replicas: 1
+   environment:
+     DSN: "host=postgres port=5432 user=postgres password=password dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+
+ # log-service: a service to store logs
+ log-service:
+   container_name: log-service
+   build:
+     context: ../
+     dockerfile: ./log-service/log-service.dockerfile
+   restart: always
+   ports:
+     - "8082:80"
+   deploy:
+     mode: replicated
+     replicas: 1
+   volumes:
+     - ../log-service/log-service/templates/:/app/templates
+
+ # listener-service - watches rabbitmq for messages
+ listener-service:
+   container_name: listener-service
+   build:
+     context: ../
+     dockerfile: ./listener-service/listener-service.dockerfile
+   deploy:
+     mode: replicated
+     replicas: 1
+   environment:
+     RABBIT_URL: "amqp://guest:guest@rabbitmq"
+
+ # postgres: start Postgres, and ensure that data is stored to a mounted volume
+ postgres:
+    container_name: postgres
+    image: 'postgres:15.0'
+    ports:
+      - "5432:5432"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users
+    volumes:
+      - ../db/postgres/:/var/lib/postgresql/data/
+
+ # mongo: start MongoDB and ensure that data is stored to a mounted volume
+ mongo:
+   container_name: mongo
+   image: 'mongo:4.2.17-bionic'
+   ports:
+     - "27017:27017"
+   restart: always
+   deploy:
+     mode: replicated
+     replicas: 1
+   environment:
+     MONGO_INITDB_DATABASE: logs
+     MONGO_INITDB_ROOT_USERNAME: admin
+     MONGO_INITDB_ROOT_PASSWORD: password
+   volumes:
+     - ../db/mongo/:/data/db
+
+ # rabbitmq: the rabbitmq server
+ rabbitmq:
+   container_name: rabbitmq
+   image: 'rabbitmq:3.9-alpine'
+   ports:
+     - "5672:5672"
+    #  - "15672:15672"
+   deploy:
+     mode: replicated
+     replicas: 1
+  #  environment:
+  #   RABBITMQ_DEFAULT_USER: admin
+  #   RABBITMQ_DEFAULT_PASS: rabbit
+   volumes:
+     - ../db/rabbitmq/:/var/lib/rabbitmq/
