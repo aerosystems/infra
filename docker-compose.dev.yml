@@ -62,7 +62,7 @@ services:
  # postgres: start Postgres, and ensure that data is stored to a mounted volume
  postgres:
     container_name: postgres
-    image: 'postgres:15.0'
+    image: 'postgres:15.1'
     ports:
       - "5432:5432"
     restart: always

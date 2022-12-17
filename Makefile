@@ -1,4 +1,4 @@
-REPOSITORY=aerosystems
+CONTAINER_REPOSITORY=aerosystems
 GIT_REPOSITORY=github.com/aerosystems
 
 AUTH_BINARY=auth-service.bin
@@ -22,10 +22,21 @@ down:
 	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev down
 	@echo "Docker stopped!"
 
-## build_dockerfiles: builds all dockerfile images
-# build_dockerfiles: build_auth
-# 	@echo "Building dockerfiles..."
-# 	docker build -f ./auth-service.dockerfile -t ${REPOSITORY}/auth-service:${AUTH_VERSION} .
+## build-up: stops docker-compose (if running), builds all projects and starts docker compose
+build-up: build-auth build-log build-listener build-broker
+	@echo "Stopping docker images (if running...)"
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev down
+	@echo "Building (when required) and starting docker images..."
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d
+	@echo "Docker images built and started!"
+
+# build-dockerfiles: builds all dockerfile images
+build-dockerfiles: build-auth build-broker build-listener build-log
+	@echo "Building dockerfiles..."
+	docker build -f ../auth-service/auth-service.dockerfile -t ${CONTAINER_REPOSITORY}/auth-service:${AUTH_VERSION} ../
+	docker build -f ../broker-service/broker-service.dockerfile -t ${CONTAINER_REPOSITORY}/broker-service:${AUTH_VERSION} ../
+	docker build -f ../listener-service/listener-service.dockerfile -t ${CONTAINER_REPOSITORY}/listener-service:${AUTH_VERSION} ../
+	docker build -f ../log-service/log-service.dockerfile -t ${CONTAINER_REPOSITORY}/log-service:${AUTH_VERSION} ../
 
 ## build-auth: builds the authentication binary as a linux executable
 build-auth:
@@ -50,14 +61,6 @@ build-broker:
 	@echo "Building broker binary..."
 	cd ../broker-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${BROKER_BINARY} ./cmd/api
 	@echo "Broker binary built!"
-
-## build: stops docker-compose (if running), builds all projects and starts docker compose
-build: build-auth build-log build-listener build-broker
-	@echo "Stopping docker images (if running...)"
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev down
-	@echo "Building (when required) and starting docker images..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d
-	@echo "Docker images built and started!"
 
 ## auth: stops auth-service, removes docker image, builds service, and starts it
 auth: build-auth
@@ -107,6 +110,12 @@ clean:
 	@cd ../broker-service && rm -f ${BROKER_BINARY}
 	@cd ../broker-service && go clean
 	@echo "Cleaned!"
+
+## import-dump: import SQL dump on running postgres container, required param "db" - database name, "dump" - path for sql dump file
+import-dump:
+	echo "DROP DATABASE \"$(db)\"" | docker exec -i postgres psql -U postgres
+	echo "CREATE DATABASE \"$(db)\"" | docker exec -i postgres psql -U postgres
+	cat $(dump) | docker exec -i postgres psql -d $(db) -U postgres
 
 ## git: commit & push to all repos. Receive argument push='something etc." 
 git:
