@@ -15,7 +15,7 @@ services:
      mode: replicated
      replicas: 1
    environment:
-     RABBIT_URL: "amqp://guest:guest@rabbitmq"
+     RABBIT_URL: ${RABBIT_URL}
 
  # auth-service - handles user auth
  auth-service:
@@ -30,8 +30,11 @@ services:
      mode: replicated
      replicas: 1
    environment:
-     DSN: "host=postgres port=5432 user=postgres password=password dbname=users sslmode=disable timezone=UTC connect_timeout=5"
-     ACCESS_SECRET: "qwertyuiop"
+     POSTGRES_DSN: "host=postgres port=${POSTGRES_PORT} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD} dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+     REDIS_DSN: ${REDIS_DSN}
+     REDIS_PASSWORD: ${REDIS_PASSWORD}
+     ACCESS_SECRET: ${ACCESS_SECRET}
+     REFRESH_SECRET: ${REFRESH_SECRET}
 
  # log-service: a service to store logs
  log-service:
@@ -58,7 +61,7 @@ services:
      mode: replicated
      replicas: 1
    environment:
-     RABBIT_URL: "amqp://guest:guest@rabbitmq"
+     RABBIT_URL: ${RABBIT_URL}
 
  # postgres: start Postgres, and ensure that data is stored to a mounted volume
  postgres:
@@ -71,9 +74,9 @@ services:
       mode: replicated
       replicas: 1
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: users
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ../db/postgres/:/var/lib/postgresql/data/
 
@@ -88,9 +91,9 @@ services:
      mode: replicated
      replicas: 1
    environment:
-     MONGO_INITDB_DATABASE: logs
-     MONGO_INITDB_ROOT_USERNAME: admin
-     MONGO_INITDB_ROOT_PASSWORD: password
+     MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+     MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
    volumes:
      - ../db/mongo/:/data/db
 
@@ -105,7 +108,20 @@ services:
      mode: replicated
      replicas: 1
   #  environment:
-  #   RABBITMQ_DEFAULT_USER: admin
-  #   RABBITMQ_DEFAULT_PASS: rabbit
+  #   RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+  #   RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
    volumes:
      - ../db/rabbitmq/:/var/lib/rabbitmq/
+
+ # redis: the redis server
+ redis:
+   container_name: redis
+   image: 'redis:6.2-alpine'
+   restart: always
+   ports:
+     - "6379:6379"
+   command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+   volumes: 
+      - ../db/redis:/data
+
+
