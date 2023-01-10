@@ -39,6 +39,7 @@ services:
      REFRESH_EXP_MINUTES: ${REFRESH_EXP_MINUTES}
      TRUST_ROLES: ${TRUST_ROLES}
      GOOGLEMAIL_DOMAINS: ${GOOGLEMAIL_DOMAINS}
+     CODE_EXP_MINUTES: ${CODE_EXP_MINUTES}
 
  # log-service: a service to store logs
  log-service:
