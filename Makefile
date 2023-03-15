@@ -3,6 +3,8 @@ GIT_REPOSITORY=github.com/aerosystems
 
 AUTH_BINARY=auth-service.bin
 AUTH_VERSION=1.0.0
+PROJECT_BINARY=project-service.bin
+PROJECT_VERSION=1.0.0
 LOG_BINARY=log-service.bin
 LOG_VERSION=1.0.0
 LISTENER_BINARY=listener-service.bin
@@ -23,7 +25,7 @@ down:
 	@echo "Docker stopped!"
 
 ## build-up: stops docker-compose (if running), builds all projects and starts docker compose
-build-up: build-auth build-log build-listener build-broker
+build-up: build-auth build-project build-log build-listener build-broker
 	@echo "Stopping docker images (if running...)"
 	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev down
 	@echo "Building (when required) and starting docker images..."
@@ -31,7 +33,7 @@ build-up: build-auth build-log build-listener build-broker
 	@echo "Docker images built and started!"
 
 # build-dockerfiles: builds all dockerfile images
-build-dockerfiles: build-auth build-broker build-listener build-log
+build-dockerfiles: build-auth build-project build-broker build-listener build-log
 	@echo "Building dockerfiles..."
 	docker build -f ../auth-service/auth-service.dockerfile -t ${CONTAINER_REPOSITORY}/auth-service:${AUTH_VERSION} ../
 	docker build -f ../broker-service/broker-service.dockerfile -t ${CONTAINER_REPOSITORY}/broker-service:${AUTH_VERSION} ../
@@ -43,6 +45,13 @@ build-auth:
 	@echo "Building authentication binary.."
 	cd ../auth-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${AUTH_BINARY} ./cmd/api
 	@echo "Authentication binary built!"
+
+## build-project: builds the project-service binary as a linux executable
+build-project:
+	@echo "Building project-service binary.."
+	cd ../project-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${PROJECT_BINARY} ./cmd/api
+	@echo "project-service binary built!"
+
 
 ## build-log: builds the logger binary as a linux executable
 build-log:
@@ -70,6 +79,15 @@ auth: build-auth
 	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d auth-service
 	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start auth-service
 	@echo "auth-service built and started!"
+
+## project: stops project-service, removes docker image, builds service, and starts it
+project: build-project
+	@echo "Building project-service docker image..."
+	- docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop project-service
+	- docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f project-service
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d project-service
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start project-service
+	@echo "project-service built and started!"
 
 ## log: stops log-service, removes docker image, builds service, and starts it
 log: build-log
@@ -103,6 +121,8 @@ clean:
 	@echo "Cleaning..."
 	@cd ../auth-service && rm -f ${AUTH_BINARY}
 	@cd ../auth-service && go clean
+	@cd ../project-service && rm -f ${PROJECT_BINARY}
+	@cd ../project-service && go clean
 	@cd ../log-service && rm -f ${LOG_BINARY}
 	@cd ../log-service && go clean
 	@cd ../listener-service && rm -f ${LISTENER_BINARY}
@@ -117,26 +137,11 @@ import-dump:
 	echo "CREATE DATABASE \"$(db)\"" | docker exec -i postgres psql -U postgres
 	cat $(dump) | docker exec -i postgres psql -d $(db) -U postgres
 
-## git: commit & push to all repos. Receive argument push='something etc." 
-git:
-	@echo "Pushing commit \"${push}\" to ${GIT_REPOSITORY}/auth-service"
-	@cd ../auth-service && git add . && git commit --allow-empty -m ${push} && git push
-	@echo "Commit \"${push}\" pushed"
-	@echo "Pushing commit \"${push}\" to ${GIT_REPOSITORY}/log-service"
-	@cd ../log-service && git add . && git commit --allow-empty -m ${push} && git push
-	@echo "Commit \"${push}\" pushed"
-	@echo "Pushing commit \"${push}\" to ${GIT_REPOSITORY}/broker-service"
-	@cd ../broker-service && git add . && git commit --allow-empty -m ${push} && git push
-	@echo "Commit \"${push}\" pushed"
-	@echo "Pushing commit \"${push}\" to ${GIT_REPOSITORY}/listener-service"
-	@cd ../listener-service && git add . && git commit --allow-empty -m ${push} && git push
-	@echo "Commit \"${push}\" pushed"
-	@echo "Pushing commit \"${push}\" to ${GIT_REPOSITORY}/verifire-frontend"
-	@cd ../verifire-frontend && git add . && git commit --allow-empty -m ${push} && git push
-	@echo "Commit \"${push}\" pushed"
-	@echo "Pushing commit \"${push}\" to ${GIT_REPOSITORY}/verifire-scripts"
-	@cd ../verifire-scripts && git add . && git commit --allow-empty -m ${push} && git push
-	@echo "Commit \"${push}\" pushed"
+## doc: generating Swagger Docs
+doc:
+	@echo "Stopping generating Swagger Docs..."
+	swag init -g ../auth-service/cmd/api/* --output ../auth-service/docs
+	@echo "Swagger Docs prepared, look at /docs"
 
 ## help: displays help
 help: Makefile

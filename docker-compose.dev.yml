@@ -1,75 +1,59 @@
 version: '3'
 
 services:
+  # api-gateway - main entry point
+#  api-gateway:
+#    container_name: auth-service
+#    build:
+#      context: ../
+#      dockerfile: ./verifire-gateway/Dockerfile
+#    restart: always
+#    ports:
+#      - "80:80"
 
- # broker-service - main entry point; we call this from the front end
- broker-service:
-   container_name: broker-service
-   build:
-     context: ../
-     dockerfile: ./broker-service/broker-service.dockerfile
-   restart: always
-   ports:
-     - "8080:80"
-   deploy:
-     mode: replicated
-     replicas: 1
-   environment:
-     RABBIT_URL: ${RABBIT_URL}
+  # auth-service - handles user auth
+  auth-service:
+    container_name: auth-service
+    build:
+      context: ../
+      dockerfile: ./auth-service/Dockerfile
+    restart: always
+    ports:
+      - "8081:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_DSN: ${AUTH_POSTGRES_DSN}
+      REDIS_DSN: ${REDIS_DSN}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      ACCESS_SECRET: ${ACCESS_SECRET}
+      ACCESS_EXP_MINUTES: ${ACCESS_EXP_MINUTES}
+      REFRESH_SECRET: ${REFRESH_SECRET}
+      REFRESH_EXP_MINUTES: ${REFRESH_EXP_MINUTES}
+      TRUST_ROLES: ${TRUST_ROLES}
+      GOOGLEMAIL_DOMAINS: ${GOOGLEMAIL_DOMAINS}
+      CODE_EXP_MINUTES: ${CODE_EXP_MINUTES}
+      APP_ENV: ${APP_ENV}
 
- # auth-service - handles user auth
- auth-service:
-   container_name: auth-service
-   build:
-     context: ../
-     dockerfile: ./auth-service/auth-service.dockerfile
-   restart: always
-   ports:
-     - "8081:80"
-   deploy:
-     mode: replicated
-     replicas: 1
-   environment:
-     POSTGRES_DSN: ${POSTGRES_DSN}
-     REDIS_DSN: ${REDIS_DSN}
-     REDIS_PASSWORD: ${REDIS_PASSWORD}
-     ACCESS_SECRET: ${ACCESS_SECRET}
-     ACCESS_EXP_MINUTES: ${ACCESS_EXP_MINUTES}
-     REFRESH_SECRET: ${REFRESH_SECRET}
-     REFRESH_EXP_MINUTES: ${REFRESH_EXP_MINUTES}
-     TRUST_ROLES: ${TRUST_ROLES}
-     GOOGLEMAIL_DOMAINS: ${GOOGLEMAIL_DOMAINS}
-     CODE_EXP_MINUTES: ${CODE_EXP_MINUTES}
+  # project-service - handles user projects
+  project-service:
+    container_name: project-service
+    build:
+      context: ../
+      dockerfile: ./project-service/Dockerfile
+    restart: always
+    ports:
+      - "8082:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_DSN: ${PROJECT_POSTGRES_DSN}
+      APP_ENV: ${APP_ENV}
 
- # log-service: a service to store logs
- log-service:
-   container_name: log-service
-   build:
-     context: ../
-     dockerfile: ./log-service/log-service.dockerfile
-   restart: always
-   ports:
-     - "8082:80"
-   deploy:
-     mode: replicated
-     replicas: 1
-   volumes:
-     - ../log-service/log-service/templates/:/app/templates
-
- # listener-service - watches rabbitmq for messages
- listener-service:
-   container_name: listener-service
-   build:
-     context: ../
-     dockerfile: ./listener-service/listener-service.dockerfile
-   deploy:
-     mode: replicated
-     replicas: 1
-   environment:
-     RABBIT_URL: ${RABBIT_URL}
-
- # postgres: start Postgres, and ensure that data is stored to a mounted volume
- postgres:
+  # postgres: start Postgres, and ensure that data is stored to a mounted volume
+  postgres:
     container_name: postgres
     image: 'postgres:15.1'
     ports:
@@ -85,48 +69,90 @@ services:
     volumes:
       - ../db/postgres/:/var/lib/postgresql/data/
 
- # mongo: start MongoDB and ensure that data is stored to a mounted volume
- mongo:
-   container_name: mongo
-   image: 'mongo:4.2.17-bionic'
-   ports:
-     - "27017:27017"
-   restart: always
-   deploy:
-     mode: replicated
-     replicas: 1
-   environment:
-     MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-     MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-   volumes:
-     - ../db/mongo/:/data/db
-
- # rabbitmq: the rabbitmq server
- rabbitmq:
-   container_name: rabbitmq
-   image: 'rabbitmq:3.9-alpine'
-   ports:
-     - "5672:5672"
-    #  - "15672:15672"
-   deploy:
-     mode: replicated
-     replicas: 1
-  #  environment:
-  #   RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
-  #   RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
-   volumes:
-     - ../db/rabbitmq/:/var/lib/rabbitmq/
-
- # redis: the redis server
- redis:
-   container_name: redis
-   image: 'redis:6.2-alpine'
-   restart: always
-   ports:
-     - "6379:6379"
-   command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
-   volumes: 
+  # redis: the redis server
+  redis:
+    container_name: redis
+    image: 'redis:6.2-alpine'
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes:
       - ../db/redis:/data
 
+ # broker-service - main entry point; we call this from the front end
+# broker-service:
+#   container_name: broker-service
+#   build:
+#     context: ../
+#     dockerfile: ./broker-service/broker-service.dockerfile
+#   restart: always
+#   ports:
+#     - "8080:80"
+#   deploy:
+#     mode: replicated
+#     replicas: 1
+#   environment:
+#     RABBIT_URL: ${RABBIT_URL}
 
+ # log-service: a service to store logs
+# log-service:
+#   container_name: log-service
+#   build:
+#     context: ../
+#     dockerfile: ./log-service/log-service.dockerfile
+#   restart: always
+#   ports:
+#     - "8082:80"
+#   deploy:
+#     mode: replicated
+#     replicas: 1
+#   volumes:
+#     - ../log-service/log-service/templates/:/app/templates
+
+ # listener-service - watches rabbitmq for messages
+# listener-service:
+#   container_name: listener-service
+#   build:
+#     context: ../
+#     dockerfile: ./listener-service/listener-service.dockerfile
+#   deploy:
+#     mode: replicated
+#     replicas: 1
+#   environment:
+#     RABBIT_URL: ${RABBIT_URL}
+
+
+
+ # mongo: start MongoDB and ensure that data is stored to a mounted volume
+# mongo:
+#   container_name: mongo
+#   image: 'mongo:4.2.17-bionic'
+#   ports:
+#     - "27017:27017"
+#   restart: always
+#   deploy:
+#     mode: replicated
+#     replicas: 1
+#   environment:
+#     MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+#     MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+#     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+#   volumes:
+#     - ../db/mongo/:/data/db
+
+ # rabbitmq: the rabbitmq server
+# rabbitmq:
+#   container_name: rabbitmq
+#   image: 'rabbitmq:3.9-alpine'
+#   ports:
+#     - "5672:5672"
+#    #  - "15672:15672"
+#   deploy:
+#     mode: replicated
+#     replicas: 1
+#  #  environment:
+#  #   RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+#  #   RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+#   volumes:
+#     - ../db/rabbitmq/:/var/lib/rabbitmq/
