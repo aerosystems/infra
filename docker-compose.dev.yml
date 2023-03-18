@@ -52,6 +52,22 @@ services:
       POSTGRES_DSN: ${PROJECT_POSTGRES_DSN}
       APP_ENV: ${APP_ENV}
 
+  # checkmail-service - handles domain & emails
+  checkmail-service:
+    container_name: checkmail-service
+    build:
+      context: ../
+      dockerfile: ./checkmail-service/Dockerfile
+    restart: always
+    ports:
+      - "8083:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_DSN: ${CHECKMAIL_POSTGRES_DSN}
+      APP_ENV: ${APP_ENV}
+
   # postgres: start Postgres, and ensure that data is stored to a mounted volume
   postgres:
     container_name: postgres
