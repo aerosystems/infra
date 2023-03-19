@@ -67,6 +67,8 @@ services:
     environment:
       POSTGRES_DSN: ${CHECKMAIL_POSTGRES_DSN}
       APP_ENV: ${APP_ENV}
+      TRUST_DOMAIN_TYPES: ${TRUST_DOMAIN_TYPES}
+      TRUST_DOMAIN_COVERAGES: ${TRUST_DOMAIN_COVERAGES}
 
   # postgres: start Postgres, and ensure that data is stored to a mounted volume
   postgres:
