@@ -1,0 +1,15 @@
+basePath: /v1
+host: localhost:8082
+info:
+  contact:
+    name: Artem Kostenko
+    url: https://github.com/aerosystems
+  description: A part of microservice infrastructure, who responsible for managing
+    user Projects
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Project Service
+  version: "1.0"
+paths: {}
+swagger: "2.0"

@@ -160,7 +160,10 @@ import-dump:
 ## doc: generating Swagger Docs
 doc:
 	@echo "Stopping generating Swagger Docs..."
-	swag init -g ../auth-service/cmd/api/* --output ../auth-service/docs
+	cd ../auth-service; swag init -g cmd/api/* --output docs
+	cd ../project-service; swag init -g cmd/api/* --output docs
+	cd ../checkmail-service; swag init -g cmd/api/* --output docs
+
 	@echo "Swagger Docs prepared, look at /docs"
 
 ## help: displays help

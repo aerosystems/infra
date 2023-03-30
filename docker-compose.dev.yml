@@ -7,7 +7,7 @@ services:
 #    build:
 #      context: ../
 #      dockerfile: ./verifire-gateway/Dockerfile
-#    restart: always
+#    restart: unless-stopped
 #    ports:
 #      - "80:80"
 
@@ -17,7 +17,10 @@ services:
     build:
       context: ../
       dockerfile: ./auth-service/Dockerfile
-    restart: always
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - redis
     ports:
       - "8081:80"
     deploy:
@@ -42,7 +45,9 @@ services:
     build:
       context: ../
       dockerfile: ./project-service/Dockerfile
-    restart: always
+    restart: unless-stopped
+    depends_on:
+      - postgres
     ports:
       - "8082:80"
     deploy:
@@ -58,7 +63,9 @@ services:
     build:
       context: ../
       dockerfile: ./checkmail-service/Dockerfile
-    restart: always
+    restart: unless-stopped
+    depends_on:
+      - postgres
     ports:
       - "8083:80"
     deploy:
@@ -76,7 +83,7 @@ services:
     image: 'postgres:15.1'
     ports:
       - "5432:5432"
-    restart: always
+    restart: unless-stopped
     deploy:
       mode: replicated
       replicas: 1
@@ -91,7 +98,7 @@ services:
   redis:
     container_name: redis
     image: 'redis:6.2-alpine'
-    restart: always
+    restart: unless-stopped
     ports:
       - "6379:6379"
     command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
@@ -104,7 +111,7 @@ services:
 #   build:
 #     context: ../
 #     dockerfile: ./broker-service/broker-service.dockerfile
-#   restart: always
+#   restart: unless-stopped
 #   ports:
 #     - "8080:80"
 #   deploy:
@@ -119,7 +126,7 @@ services:
 #   build:
 #     context: ../
 #     dockerfile: ./log-service/log-service.dockerfile
-#   restart: always
+#   restart: unless-stopped
 #   ports:
 #     - "8082:80"
 #   deploy:
@@ -148,7 +155,7 @@ services:
 #   image: 'mongo:4.2.17-bionic'
 #   ports:
 #     - "27017:27017"
-#   restart: always
+#   restart: unless-stopped
 #   deploy:
 #     mode: replicated
 #     replicas: 1
