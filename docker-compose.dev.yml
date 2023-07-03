@@ -1,19 +1,31 @@
-version: '3'
-
 services:
   # api-gateway - main entry point
-#  api-gateway:
-#    container_name: auth-service
-#    build:
-#      context: ../
-#      dockerfile: ./verifire-gateway/Dockerfile
-#    restart: unless-stopped
-#    ports:
-#      - "80:80"
-
-  # auth-service - handles user auth
+  api-gateway:
+    container_name: api-gateway
+    hostname: api-gateway
+    image: 'nginx:1.21.3-alpine'
+    restart: unless-stopped
+    depends_on:
+      - auth-service
+      - project-service
+      - checkmail-service
+    environment:
+      GW_DOMAIN: ${GW_DOMAIN}
+    ports:
+      - "443:443"
+    volumes:
+      - ../verifire-gateway/nginx.conf:/etc/nginx/nginx.conf
+      - ../verifire-gateway/api_backends.conf:/etc/nginx/api_backends.conf
+      - ../verifire-gateway/api_gateway.conf:/etc/nginx/api_gateway.conf
+      - ../verifire-gateway/api_json_errors.conf:/etc/nginx/api_json_errors.conf
+      - ../verifire-gateway/api_conf.d:/etc/nginx/api_conf.d
+      - ../verifire-gateway/conf.d:/etc/nginx/conf.d
+      - ../verifire-gateway/certs:/etc/nginx/certs
+      
+      # auth-service - handles user auth
   auth-service:
     container_name: auth-service
+    hostname: auth-service
     build:
       context: ../
       dockerfile: ./auth-service/Dockerfile
@@ -42,6 +54,7 @@ services:
   # project-service - handles user projects
   project-service:
     container_name: project-service
+    hostname: project-service
     build:
       context: ../
       dockerfile: ./project-service/Dockerfile
@@ -56,10 +69,12 @@ services:
     environment:
       POSTGRES_DSN: ${PROJECT_POSTGRES_DSN}
       APP_ENV: ${APP_ENV}
+      ACCESS_SECRET: ${ACCESS_SECRET}
 
   # checkmail-service - handles domain & emails
   checkmail-service:
     container_name: checkmail-service
+    hostname: checkmail-service
     build:
       context: ../
       dockerfile: ./checkmail-service/Dockerfile
@@ -74,12 +89,14 @@ services:
     environment:
       POSTGRES_DSN: ${CHECKMAIL_POSTGRES_DSN}
       APP_ENV: ${APP_ENV}
+      ACCESS_SECRET: ${ACCESS_SECRET}
       TRUST_DOMAIN_TYPES: ${TRUST_DOMAIN_TYPES}
       TRUST_DOMAIN_COVERAGES: ${TRUST_DOMAIN_COVERAGES}
 
   # postgres: start Postgres, and ensure that data is stored to a mounted volume
   postgres:
     container_name: postgres
+    hostname: postgres
     image: 'postgres:15.1'
     ports:
       - "5432:5432"
@@ -97,6 +114,7 @@ services:
   # redis: the redis server
   redis:
     container_name: redis
+    hostname: redis
     image: 'redis:6.2-alpine'
     restart: unless-stopped
     ports:
@@ -105,68 +123,68 @@ services:
     volumes:
       - ../db/redis:/data
 
- # broker-service - main entry point; we call this from the front end
-# broker-service:
-#   container_name: broker-service
-#   build:
-#     context: ../
-#     dockerfile: ./broker-service/broker-service.dockerfile
-#   restart: unless-stopped
-#   ports:
-#     - "8080:80"
-#   deploy:
-#     mode: replicated
-#     replicas: 1
-#   environment:
-#     RABBIT_URL: ${RABBIT_URL}
+  # broker-service - main entry point; we call this from the front end
+  # broker-service:
+  #   container_name: broker-service
+  #   build:
+  #     context: ../
+  #     dockerfile: ./broker-service/broker-service.dockerfile
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8080:80"
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   environment:
+  #     RABBIT_URL: ${RABBIT_URL}
 
- # log-service: a service to store logs
-# log-service:
-#   container_name: log-service
-#   build:
-#     context: ../
-#     dockerfile: ./log-service/log-service.dockerfile
-#   restart: unless-stopped
-#   ports:
-#     - "8082:80"
-#   deploy:
-#     mode: replicated
-#     replicas: 1
-#   volumes:
-#     - ../log-service/log-service/templates/:/app/templates
+  # log-service: a service to store logs
+  # log-service:
+  #   container_name: log-service
+  #   build:
+  #     context: ../
+  #     dockerfile: ./log-service/log-service.dockerfile
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8082:80"
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   volumes:
+  #     - ../log-service/log-service/templates/:/app/templates
 
- # listener-service - watches rabbitmq for messages
-# listener-service:
-#   container_name: listener-service
-#   build:
-#     context: ../
-#     dockerfile: ./listener-service/listener-service.dockerfile
-#   deploy:
-#     mode: replicated
-#     replicas: 1
-#   environment:
-#     RABBIT_URL: ${RABBIT_URL}
+  # listener-service - watches rabbitmq for messages
+  # listener-service:
+  #   container_name: listener-service
+  #   build:
+  #     context: ../
+  #     dockerfile: ./listener-service/listener-service.dockerfile
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   environment:
+  #     RABBIT_URL: ${RABBIT_URL}
 
 
 
- # mongo: start MongoDB and ensure that data is stored to a mounted volume
-# mongo:
-#   container_name: mongo
-#   image: 'mongo:4.2.17-bionic'
-#   ports:
-#     - "27017:27017"
-#   restart: unless-stopped
-#   deploy:
-#     mode: replicated
-#     replicas: 1
-#   environment:
-#     MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-#     MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-#     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-#   volumes:
-#     - ../db/mongo/:/data/db
+  # mongo: start MongoDB and ensure that data is stored to a mounted volume
+  # mongo:
+  #   container_name: mongo
+  #   image: 'mongo:4.2.17-bionic'
+  #   ports:
+  #     - "27017:27017"
+  #   restart: unless-stopped
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   environment:
+  #     MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+  #     MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+  #   volumes:
+  #     - ../db/mongo/:/data/db
 
- # rabbitmq: the rabbitmq server
+  # rabbitmq: the rabbitmq server
 # rabbitmq:
 #   container_name: rabbitmq
 #   image: 'rabbitmq:3.9-alpine'
