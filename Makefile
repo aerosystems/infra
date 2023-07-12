@@ -7,6 +7,8 @@ PROJECT_BINARY=project-service.bin
 PROJECT_VERSION=1.0.0
 CHECKMAIL_BINARY=checkmail-service.bin
 CHECKMAIL_VERSION=1.0.0
+MAIL_BINARY=mail-service.bin
+MAIL_VERSION=1.0.0
 LOG_BINARY=log-service.bin
 LOG_VERSION=1.0.0
 LISTENER_BINARY=listener-service.bin
@@ -27,7 +29,7 @@ down:
 	@echo "Docker stopped!"
 
 ## build-up: stops docker-compose (if running), builds all projects and starts docker compose
-build-up: build-auth build-project build-checkmail build-log build-listener build-broker
+build-up: build-auth build-project build-checkmail build-mail build-log build-listener build-broker
 	@echo "Stopping docker images (if running...)"
 	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev down
 	@echo "Building (when required) and starting docker images..."
@@ -35,11 +37,12 @@ build-up: build-auth build-project build-checkmail build-log build-listener buil
 	@echo "Docker images built and started!"
 
 # build-dockerfiles: builds all dockerfile images
-build-dockerfiles: build-auth build-project build-checkmail build-broker build-listener build-log
+build-dockerfiles: build-auth build-project build-checkmail build-mail build-broker build-listener build-log
 	@echo "Building dockerfiles..."
 	docker build -f ../auth-service/auth-service.dockerfile -t ${CONTAINER_REPOSITORY}/auth-service:${AUTH_VERSION} ../
 	docker build -f ../project-service/project-service.dockerfile -t ${CONTAINER_REPOSITORY}/project-service:${AUTH_VERSION} ../
 	docker build -f ../checkmail-service/checkmail-service.dockerfile -t ${CONTAINER_REPOSITORY}/checkmail-service:${AUTH_VERSION} ../
+	docker build -f ../mail-service/mail-service.dockerfile -t ${CONTAINER_REPOSITORY}/mail-service:${AUTH_VERSION} ../
 	docker build -f ../broker-service/broker-service.dockerfile -t ${CONTAINER_REPOSITORY}/broker-service:${AUTH_VERSION} ../
 	docker build -f ../listener-service/listener-service.dockerfile -t ${CONTAINER_REPOSITORY}/listener-service:${AUTH_VERSION} ../
 	docker build -f ../log-service/log-service.dockerfile -t ${CONTAINER_REPOSITORY}/log-service:${AUTH_VERSION} ../
@@ -47,25 +50,31 @@ build-dockerfiles: build-auth build-project build-checkmail build-broker build-l
 ## build-auth: builds the authentication binary as a linux executable
 build-auth:
 	@echo "Building authentication binary.."
-	cd ../auth-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${AUTH_BINARY} ./cmd/api
+	cd ../auth-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${AUTH_BINARY} ./cmd/api/*
 	@echo "Authentication binary built!"
 
 ## build-project: builds the project-service binary as a linux executable
 build-project:
 	@echo "Building project-service binary.."
-	cd ../project-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${PROJECT_BINARY} ./cmd/api
+	cd ../project-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${PROJECT_BINARY} ./cmd/api/*
 	@echo "project-service binary built!"
 
 ## build-checkmail: builds the checkmail-service binary as a linux executable
 build-checkmail:
 	@echo "Building checkmail-service binary.."
-	cd ../checkmail-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${CHECKMAIL_BINARY} ./cmd/api
+	cd ../checkmail-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${CHECKMAIL_BINARY} ./cmd/api/*
 	@echo "checkmail-service binary built!"
+
+## build-mail: builds the mail-service binary as a linux executable
+build-mail:
+	@echo "Building mail-service binary.."
+	cd ../mail-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${MAIL_BINARY} ./cmd/api/*
+	@echo "mail-service binary built!"
 
 ## build-log: builds the logger binary as a linux executable
 build-log:
 	@echo "Building log binary..."
-	cd ../log-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${LOG_BINARY} ./cmd/web
+	cd ../log-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${LOG_BINARY} ./cmd/web/*
 	@echo "Log binary built!"
 
 ## build-listener: builds the listener binary as a linux executable
@@ -77,7 +86,7 @@ build-listener:
 ## build-broker: builds the broker binary as a linux executable
 build-broker:
 	@echo "Building broker binary..."
-	cd ../broker-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${BROKER_BINARY} ./cmd/api
+	cd ../broker-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${BROKER_BINARY} ./cmd/api/*
 	@echo "Broker binary built!"
 
 ## auth: stops auth-service, removes docker image, builds service, and starts it
@@ -105,7 +114,16 @@ checkmail: build-checkmail
 	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f checkmail-service
 	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d checkmail-service
 	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start checkmail-service
-	@echo "project-service built and started!"
+	@echo "checkmail-service built and started!"
+
+## mail: stops mail-service, removes docker image, builds service, and starts it
+mail: build-mail
+	@echo "Building checkmail-service docker image..."
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop mail-service
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f mail-service
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d mail-service
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start mail-service
+	@echo "mail-service built and started!"
 
 ## log: stops log-service, removes docker image, builds service, and starts it
 log: build-log
@@ -143,6 +161,8 @@ clean:
 	@cd ../project-service && go clean
 	@cd ../checkmail-service && rm -f ${CHECKMAIL_BINARY}
 	@cd ../checkmail-service && go clean
+	@cd ../mail-service && rm -f ${MAIL_BINARY}
+	@cd ../mail-service && go clean
 	@cd ../log-service && rm -f ${LOG_BINARY}
 	@cd ../log-service && go clean
 	@cd ../listener-service && rm -f ${LISTENER_BINARY}

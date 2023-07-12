@@ -22,7 +22,7 @@ services:
       - ../verifire-gateway/conf.d:/etc/nginx/conf.d
       - ../verifire-gateway/certs:/etc/nginx/certs
       
-      # auth-service - handles user auth
+  # auth-service - handles user auth
   auth-service:
     container_name: auth-service
     hostname: auth-service
@@ -35,9 +35,6 @@ services:
       - redis
     ports:
       - "8081:80"
-    deploy:
-      mode: replicated
-      replicas: 1
     environment:
       POSTGRES_DSN: ${AUTH_POSTGRES_DSN}
       REDIS_DSN: ${REDIS_DSN}
@@ -49,6 +46,8 @@ services:
       TRUST_ROLES: ${TRUST_ROLES}
       GOOGLEMAIL_DOMAINS: ${GOOGLEMAIL_DOMAINS}
       CODE_EXP_MINUTES: ${CODE_EXP_MINUTES}
+      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
+      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
       APP_ENV: ${APP_ENV}
 
   # project-service - handles user projects
@@ -63,13 +62,12 @@ services:
       - postgres
     ports:
       - "8082:80"
-    deploy:
-      mode: replicated
-      replicas: 1
     environment:
       POSTGRES_DSN: ${PROJECT_POSTGRES_DSN}
       APP_ENV: ${APP_ENV}
       ACCESS_SECRET: ${ACCESS_SECRET}
+      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
+      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
 
   # checkmail-service - handles domain & emails
   checkmail-service:
@@ -83,15 +81,29 @@ services:
       - postgres
     ports:
       - "8083:80"
-    deploy:
-      mode: replicated
-      replicas: 1
     environment:
       POSTGRES_DSN: ${CHECKMAIL_POSTGRES_DSN}
       APP_ENV: ${APP_ENV}
       ACCESS_SECRET: ${ACCESS_SECRET}
       TRUST_DOMAIN_TYPES: ${TRUST_DOMAIN_TYPES}
       TRUST_DOMAIN_COVERAGES: ${TRUST_DOMAIN_COVERAGES}
+      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
+      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
+
+  # mail-service - sends emails
+  mail-service:
+    container_name: mail-service
+    hostname: mail-service
+    build:
+        context: ../
+        dockerfile: ./mail-service/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - mailhog
+    expose:
+      - "5001"
+    environment:
+      BREVO_API_KEY: ${BREVO_API_KEY}
 
   # postgres: start Postgres, and ensure that data is stored to a mounted volume
   postgres:
@@ -101,9 +113,6 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
-    deploy:
-      mode: replicated
-      replicas: 1
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -122,6 +131,15 @@ services:
     command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
     volumes:
       - ../db/redis:/data
+
+  # mailhog: a fake smtp server with a web interface
+  mailhog:
+    container_name: mailhog
+    hostname: mailhog
+    image: 'mailhog/mailhog:latest'
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
   # broker-service - main entry point; we call this from the front end
   # broker-service:
@@ -151,7 +169,7 @@ services:
   #     mode: replicated
   #     replicas: 1
   #   volumes:
-  #     - ../log-service/log-service/templates/:/app/templates
+  #     - ../log-service/log-service/templates/:/api/templates
 
   # listener-service - watches rabbitmq for messages
   # listener-service:
@@ -164,8 +182,6 @@ services:
   #     replicas: 1
   #   environment:
   #     RABBIT_URL: ${RABBIT_URL}
-
-
 
   # mongo: start MongoDB and ensure that data is stored to a mounted volume
   # mongo:
