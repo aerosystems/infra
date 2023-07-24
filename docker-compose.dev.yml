@@ -21,7 +21,7 @@ services:
       - ../verifire-gateway/api_conf.d:/etc/nginx/api_conf.d
       - ../verifire-gateway/conf.d:/etc/nginx/conf.d
       - ../verifire-gateway/certs:/etc/nginx/certs
-      
+
   # auth-service - handles user auth
   auth-service:
     container_name: auth-service
@@ -97,8 +97,8 @@ services:
     container_name: mail-service
     hostname: mail-service
     build:
-        context: ../
-        dockerfile: ./mail-service/Dockerfile
+      context: ../
+      dockerfile: ./mail-service/Dockerfile
     restart: unless-stopped
     depends_on:
       - mailhog
@@ -161,6 +161,49 @@ services:
       - "8025:8025"
       - ${MAILHOG_PORT}:${MAILHOG_PORT}
 
+  # elk: the elasticsearch, logstash, and kibana stack
+  elasticsearch:
+    image: elasticsearch:7.1.0
+    volumes:
+      - ../db/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      - "discovery.type=single-node"
+
+  logstash:
+    build:
+      context: .
+      dockerfile: ./logstash/Dockerfile
+    ports:
+      - 9600:9600
+      - 5228:5228
+    environment:
+      LOGSTASH_PORT: 5228
+      LOGSTASH_INDEX: "test-index"
+      ELASTIC_HOST: "elasticsearch:9200"
+      ELASTIC_USERNAME: "elastic"
+      ELASTIC_PASSWORD: "elastic"
+    depends_on:
+      - elasticsearch
+    links:
+      - elasticsearch
+
+  kibana:
+    image: kibana:7.1.0
+    hostname: kibana
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    links:
+      - elasticsearch
+    environment:
+      ELASTIC_HOST: "http://elasticsearch:9200"
+      ELASTIC_USERNAME: "elastic"
+      ELASTIC_PASSWORD: "elastic"
+
   # broker-service - main entry point; we call this from the front end
   # broker-service:
   #   container_name: broker-service
@@ -176,21 +219,6 @@ services:
   #   environment:
   #     RABBIT_URL: ${RABBIT_URL}
 
-  # log-service: a service to store logs
-  # log-service:
-  #   container_name: log-service
-  #   build:
-  #     context: ../
-  #     dockerfile: ./log-service/log-service.dockerfile
-  #   restart: unless-stopped
-  #   ports:
-  #     - "8082:80"
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 1
-  #   volumes:
-  #     - ../log-service/log-service/templates/:/api/templates
-
   # listener-service - watches rabbitmq for messages
   # listener-service:
   #   container_name: listener-service
@@ -203,22 +231,6 @@ services:
   #   environment:
   #     RABBIT_URL: ${RABBIT_URL}
 
-  # mongo: start MongoDB and ensure that data is stored to a mounted volume
-  # mongo:
-  #   container_name: mongo
-  #   image: 'mongo:4.2.17-bionic'
-  #   ports:
-  #     - "27017:27017"
-  #   restart: unless-stopped
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 1
-  #   environment:
-  #     MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
-  #     MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-  #   volumes:
-  #     - ../db/mongo/:/data/db
 
   # rabbitmq: the rabbitmq server
 # rabbitmq:
