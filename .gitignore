@@ -2,4 +2,3 @@
 .DS_Store
 *.bin
 .env*
-../data/elk/certs
