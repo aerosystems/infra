@@ -90,6 +90,15 @@ build-broker:
 	cd ../broker-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${BROKER_BINARY} ./cmd/api/*
 	@echo "Broker binary built!"
 
+## gw: stops API Gateway, removes docker image, builds service, and starts it
+gw:
+	@echo "Building api-gateway docker image..."
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop api-gateway
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f api-gateway
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d api-gateway
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start api-gateway
+	@echo "api-gateway built and started!"
+
 ## auth: stops auth-service, removes docker image, builds service, and starts it
 auth: build-auth
 	@echo "Building auth-service docker image..."

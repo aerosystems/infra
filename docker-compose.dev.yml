@@ -77,7 +77,7 @@ services:
     networks:
       - log_network
     
-    # project-service - handles user projects
+  # project-service - handles user projects
   project-service:
     container_name: project-service
     hostname: project-service
@@ -97,6 +97,29 @@ services:
       ACCESS_SECRET: ${ACCESS_SECRET}
       BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
       BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
+    volumes:
+      - "../project-service/logs:/app/logs"
+
+  project-filebeat:
+    hostname: project-filebeat
+    container_name: project-filebeat
+    depends_on:
+      - project-service
+    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+    user: root
+    volumes:
+      - "../project-service/filebeat/certs:/usr/share/filebeat/certs"
+      - "../project-service/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+      - "../project-service/logs:/usr/share/filebeat/ingest_data"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_HOSTS=https://es01:9200
+      - KIBANA_HOSTS=http://kibana:5601
+      - LOGSTASH_HOSTS=http://logstash01:9600
+    networks:
+      - log_network
 
   # checkmail-service - handles domain & emails
   checkmail-service:
@@ -118,6 +141,29 @@ services:
       TRUST_DOMAIN_COVERAGES: ${TRUST_DOMAIN_COVERAGES}
       BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
       BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
+    volumes:
+      - "../checkmail-service/logs:/app/logs"
+
+  checkmail-filebeat:
+    hostname: checkmail-filebeat
+    container_name: checkmail-filebeat
+    depends_on:
+      - checkmail-service
+    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+    user: root
+    volumes:
+      - "../checkmail-service/filebeat/certs:/usr/share/filebeat/certs"
+      - "../checkmail-service/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+      - "../checkmail-service/logs:/usr/share/filebeat/ingest_data"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_HOSTS=https://es01:9200
+      - KIBANA_HOSTS=http://kibana:5601
+      - LOGSTASH_HOSTS=http://logstash01:9600
+    networks:
+      - log_network
 
   # mail-service - sends emails
   mail-service:
@@ -140,6 +186,29 @@ services:
       MAILHOG_ENCRYPTION: ${MAILHOG_ENCRYPTION}
       MAILHOG_USERNAME: ${MAILHOG_USERNAME}
       MAILHOG_PASSWORD: ${MAILHOG_PASSWORD}
+    volumes:
+      - "../mail-service/logs:/app/logs"
+
+  mail-filebeat:
+    hostname: mail-filebeat
+    container_name: mail-filebeat
+    depends_on:
+      - mail-service
+    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+    user: root
+    volumes:
+      - "../mail-service/filebeat/certs:/usr/share/filebeat/certs"
+      - "../mail-service/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+      - "../mail-service/logs:/usr/share/filebeat/ingest_data"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_HOSTS=https://es01:9200
+      - KIBANA_HOSTS=http://kibana:5601
+      - LOGSTASH_HOSTS=http://logstash01:9600
+    networks:
+      - log_network
 
   # lookup-service - determines email domain type
   lookup-service:
@@ -149,8 +218,41 @@ services:
       context: ../
       dockerfile: ./lookup-service/Dockerfile
     restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "8084:80"
     expose:
       - "5001"
+    volumes:
+      - "../lookup-service/logs:/app/logs"
+    environment:
+        BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
+        BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
+        POSTGRES_DSN: ${LOOKUP_POSTGRES_DSN}
+        APP_ENV: ${APP_ENV}
+        ACCESS_SECRET: ${ACCESS_SECRET}
+
+  lookup-filebeat:
+    hostname: lookup-filebeat
+    container_name: lookup-filebeat
+    depends_on:
+      - lookup-service
+    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+    user: root
+    volumes:
+      - "../lookup-service/filebeat/certs:/usr/share/filebeat/certs"
+      - "../lookup-service/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+      - "../lookup-service/logs:/usr/share/filebeat/ingest_data"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_HOSTS=https://es01:9200
+      - KIBANA_HOSTS=http://kibana:5601
+      - LOGSTASH_HOSTS=http://logstash01:9600
+    networks:
+      - log_network
 
   # postgres: start Postgres, and ensure that data is stored to a mounted volume
   postgres:
