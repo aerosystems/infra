@@ -141,6 +141,7 @@ services:
       TRUST_DOMAIN_COVERAGES: ${TRUST_DOMAIN_COVERAGES}
       BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
       BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
+      TG_BOT_TOKEN: ${TG_BOT_TOKEN}
     volumes:
       - "../checkmail-service/logs:/app/logs"
 
@@ -216,12 +217,13 @@ services:
     hostname: lookup-service
     build:
       context: ../
-      dockerfile: ./lookup-service/Dockerfile
+      dockerfile: ./lookup-service/Dockerfile.debug
     restart: unless-stopped
     depends_on:
       - postgres
     ports:
       - "8084:80"
+      - "40000:40000"
     expose:
       - "5001"
     volumes:
@@ -232,6 +234,11 @@ services:
         POSTGRES_DSN: ${LOOKUP_POSTGRES_DSN}
         APP_ENV: ${APP_ENV}
         ACCESS_SECRET: ${ACCESS_SECRET}
+    security_opt:
+      - "seccomp:unconfined"
+    cap_add:
+        - SYS_PTRACE
+    command: /dlv --headless --listen=:40000 --api-version=2 exec /server
 
   lookup-filebeat:
     hostname: lookup-filebeat
