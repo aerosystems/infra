@@ -2,11 +2,11 @@ CONTAINER_REPOSITORY=aerosystems
 GIT_REPOSITORY=github.com/aerosystems
 
 AUTH_BINARY=auth-service.bin
-AUTH_VERSION=1.0.0
+AUTH_VERSION=1.0.7
 PROJECT_BINARY=project-service.bin
-PROJECT_VERSION=1.0.0
+PROJECT_VERSION=1.0.6
 CHECKMAIL_BINARY=checkmail-service.bin
-CHECKMAIL_VERSION=1.0.0
+CHECKMAIL_VERSION=1.0.6
 MAIL_BINARY=mail-service.bin
 MAIL_VERSION=1.0.0
 LOOKUP_BINARY=lookup-service.bin
@@ -184,9 +184,10 @@ clean:
 ## doc: generating Swagger Docs
 doc:
 	@echo "Stopping generating Swagger Docs..."
-	cd ../auth-service; swag init -g cmd/api/* --output docs
-	cd ../project-service; swag init -g cmd/api/* --output docs
-	cd ../checkmail-service; swag init -g cmd/api/* --output docs
+	cd ../auth-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../project-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../checkmail-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../lookup-service; swag init -g ./cmd/app/main.go -o ./docs
 
 	@echo "Swagger Docs prepared, look at /docs"
 

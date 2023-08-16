@@ -217,13 +217,14 @@ services:
     hostname: lookup-service
     build:
       context: ../
-      dockerfile: ./lookup-service/Dockerfile.debug
+      dockerfile: ./lookup-service/Dockerfile
+#      dockerfile: ./lookup-service/Dockerfile.debug
     restart: unless-stopped
     depends_on:
       - postgres
     ports:
       - "8084:80"
-      - "40000:40000"
+#      - "40000:40000"
     expose:
       - "5001"
     volumes:
@@ -234,11 +235,11 @@ services:
         POSTGRES_DSN: ${LOOKUP_POSTGRES_DSN}
         APP_ENV: ${APP_ENV}
         ACCESS_SECRET: ${ACCESS_SECRET}
-    security_opt:
-      - "seccomp:unconfined"
-    cap_add:
-        - SYS_PTRACE
-    command: /dlv --headless --listen=:40000 --api-version=2 exec /server
+#    security_opt:
+#      - "seccomp:unconfined"
+#    cap_add:
+#        - SYS_PTRACE
+#    command: /dlv --headless --listen=:40000 --api-version=2 exec /server
 
   lookup-filebeat:
     hostname: lookup-filebeat
