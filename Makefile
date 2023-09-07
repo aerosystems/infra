@@ -206,6 +206,7 @@ doc:
 	@echo "Stopping generating Swagger Docs..."
 	cd ../auth-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../project-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../mail-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../checkmail-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../lookup-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../recaptcha-service; swag init -g ./cmd/api/main.go -o ./docs

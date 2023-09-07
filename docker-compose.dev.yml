@@ -177,9 +177,15 @@ services:
     restart: unless-stopped
     depends_on:
       - mailhog
+    ports:
+        - "8086:80"
     expose:
       - "5001"
     environment:
+      APP_ENV: ${APP_ENV}
+      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
+      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
+      FEEDBACK_EMAIL: ${FEEDBACK_EMAIL}
       EMAIL_PROVIDER: ${EMAIL_PROVIDER}
       BREVO_API_KEY: ${BREVO_API_KEY}
       MAILHOG_DOMAIN: ${MAILHOG_DOMAIN}
