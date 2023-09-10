@@ -311,6 +311,45 @@ services:
     networks:
       - log_network
 
+  adapter-service:
+    hostname: adapter-service
+    container_name: adapter-service
+    build:
+      context: ../
+      dockerfile: ./adapter-service/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - checkmail-service
+    ports:
+      - "8087:80"
+    volumes:
+      - "../adapter-service/logs:/app/logs"
+    environment:
+      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
+      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
+      ACCESS_SECRET_PROXY: ${ACCESS_SECRET_PROXY}
+
+  adapter-filebeat:
+    hostname: adapter-filebeat
+    container_name: adapter-filebeat
+    depends_on:
+      - recaptcha-service
+    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+    user: root
+    volumes:
+      - "../adapter-service/filebeat/certs:/usr/share/filebeat/certs"
+      - "../adapter-service/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+      - "../adapter-service/logs:/usr/share/filebeat/ingest_data"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+      - ELASTIC_USER=elastic
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_HOSTS=https://es01:9200
+      - KIBANA_HOSTS=http://kibana:5601
+      - LOGSTASH_HOSTS=http://logstash01:9600
+    networks:
+      - log_network
+
   # postgres: start Postgres, and ensure that data is stored to a mounted volume
   postgres:
     container_name: postgres
@@ -346,47 +385,3 @@ services:
     ports:
       - "8025:8025"
       - ${MAILHOG_PORT}:${MAILHOG_PORT}
-
-  # broker-service - main entry point; we call this from the front end
-  # broker-service:
-  #   container_name: broker-service
-  #   build:
-  #     context: ../
-  #     dockerfile: ./broker-service/broker-service.dockerfile
-  #   restart: unless-stopped
-  #   ports:
-  #     - "8080:80"
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 1
-  #   environment:
-  #     RABBIT_URL: ${RABBIT_URL}
-
-  # listener-service - watches rabbitmq for messages
-  # listener-service:
-  #   container_name: listener-service
-  #   build:
-  #     context: ../
-  #     dockerfile: ./listener-service/listener-service.dockerfile
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 1
-  #   environment:
-  #     RABBIT_URL: ${RABBIT_URL}
-
-
-  # rabbitmq: the rabbitmq server
-# rabbitmq:
-#   container_name: rabbitmq
-#   image: 'rabbitmq:3.9-alpine'
-#   ports:
-#     - "5672:5672"
-#    #  - "15672:15672"
-#   deploy:
-#     mode: replicated
-#     replicas: 1
-#  #  environment:
-#  #   RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
-#  #   RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
-#   volumes:
-#     - ../data/rabbitmq/:/var/lib/rabbitmq/

@@ -13,10 +13,8 @@ LOOKUP_BINARY=lookup-service.bin
 LOOKUP_VERSION=1.0.0
 RECAPTCHA_BINARY=recaptcha-service.bin
 RECAPTCHA_VERSION=1.0.0
-LISTENER_BINARY=listener-service.bin
-LISTENER_VERSION=1.0.0
-BROKER_BINARY=broker-service.bin
-BROKER_VERSION=1.0.0
+ADAPTER_BINARY=adapter-service.bin
+ADAPTER_VERSION=1.0.0
 
 ## up: starts all containers in the background without forcing build
 up:
@@ -31,7 +29,7 @@ down:
 	@echo "Docker stopped!"
 
 ## build-up: stops docker-compose (if running), builds all projects and starts docker compose
-build-up: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-listener build-broker
+build-up: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter
 	@echo "Stopping docker images (if running...)"
 	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev down
 	@echo "Building (when required) and starting docker images..."
@@ -39,7 +37,7 @@ build-up: build-auth build-project build-checkmail build-mail build-lookup build
 	@echo "Docker images built and started!"
 
 # build-dockerfiles: builds all dockerfile images
-build-dockerfiles: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-listener build-broker
+build-dockerfiles: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter
 	@echo "Building dockerfiles..."
 	docker build -f ../auth-service/Dockerfile -t ${CONTAINER_REPOSITORY}/auth-service:${AUTH_VERSION} ../
 	docker build -f ../project-service/Dockerfile -t ${CONTAINER_REPOSITORY}/project-service:${PROJECT_VERSION} ../
@@ -47,8 +45,7 @@ build-dockerfiles: build-auth build-project build-checkmail build-mail build-loo
 	docker build -f ../mail-service/Dockerfile -t ${CONTAINER_REPOSITORY}/mail-service:${MAIL_VERSION} ../
 	docker build -f ../lookup-service/Dockerfile -t ${CONTAINER_REPOSITORY}/lookup-service:${LOOKUP_VERSION} ../
 	docker build -f ../recaptcha-service/Dockerfile -t ${CONTAINER_REPOSITORY}/recaptcha-service:${RECAPTCHA_VERSION} ../
-	docker build -f ../listener-service/Dockerfile -t ${CONTAINER_REPOSITORY}/listener-service:${LISTENER_VERSION} ../
-	docker build -f ../broker-service/Dockerfile -t ${CONTAINER_REPOSITORY}/broker-service:${BROKER_VERSION} ../
+	docker build -f ../adapter-service/Dockerfile -t ${CONTAINER_REPOSITORY}/adapter-service:${ADAPTER_VERSION} ../
 	@echo "Dockerfiles built!"
 
 ## build-auth: builds the authentication binary as a linux executable
@@ -87,17 +84,11 @@ build-recaptcha:
 	cd ../recaptcha-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${RECAPTCHA_BINARY} ./cmd/api/*
 	@echo "recaptcha-service binary built!"
 
-## build-listener: builds the listener binary as a linux executable
-build-listener:
-	@echo "Building listener binary..."
-	cd ../listener-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${LISTENER_BINARY} .
-	@echo "Listener binary built!"
-
-## build-broker: builds the broker binary as a linux executable
-build-broker:
-	@echo "Building broker binary..."
-	cd ../broker-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${BROKER_BINARY} ./cmd/api/*
-	@echo "Broker binary built!"
+## build-adapter: builds the adapter-service binary as a linux executable
+build-adapter:
+	@echo "Building adapter-service binary.."
+	cd ../adapter-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${ADAPTER_BINARY} ./cmd/api/*
+	@echo "adapter-service binary built!"
 
 ## gw: stops API Gateway, removes docker image, builds service, and starts it
 gw:
@@ -162,23 +153,14 @@ recaptcha: build-recaptcha
 	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start recaptcha-service
 	@echo "recaptcha-service built and started!"
 
-## listener: stops listener-service, removes docker image, builds service, and starts it
-listener: build-listener
-	@echo "Building listener-service docker image..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop listener-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f listener-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d listener-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start listener-service
-	@echo "listener-service rebuilt and started!"
-
-## broker: stops broker-service, removes docker image, builds service, and starts it
-broker: build-broker
-	@echo "Building broker-service docker image..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop broker-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f broker-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d broker-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start broker-service
-	@echo "broker-service rebuilt and started!"
+## adapter: stops adapter-service, removes docker image, builds service, and starts it
+adapter: build-adapter
+	@echo "Building adapter-service docker image..."
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop adapter-service
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f adapter-service
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d adapter-service
+	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start adapter-service
+	@echo "adapter-service built and started!"
 
 ## clean: runs go clean and deletes binaries
 clean:
@@ -195,10 +177,8 @@ clean:
 	@cd ../lookup-service && go clean
 	@cd ../recapthca-service && rm -f ${RECAPTCHA_BINARY}
 	@cd ../recapthca-service && go clean
-	@cd ../listener-service && rm -f ${LISTENER_BINARY}
-	@cd ../listener-service && go clean
-	@cd ../broker-service && rm -f ${BROKER_BINARY}
-	@cd ../broker-service && go clean
+	@cd ../adapter-service && rm -f ${ADAPTER_BINARY}
+	@cd ../adapter-service && go clean
 	@echo "Cleaned!"
 
 ## doc: generating Swagger Docs
@@ -210,6 +190,7 @@ doc:
 	cd ../checkmail-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../lookup-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../recaptcha-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../adapter-service; swag init -g ./cmd/api/main.go -o ./docs
 
 	@echo "Swagger Docs prepared, look at /docs"
 
