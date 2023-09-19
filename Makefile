@@ -19,21 +19,21 @@ ADAPTER_VERSION=1.0.0
 ## up: starts all containers in the background without forcing build
 up:
 	@echo "Starting docker images..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up -d
+	docker-compose -f ./docker-compose.yml --env-file ./.env up -d
 	@echo "Docker images started!"
 
 ## down: stop docker compose
 down:
 	@echo "Stopping docker images..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev down
+	docker-compose -f ./docker-compose.yml --env-file ./.env down
 	@echo "Docker stopped!"
 
 ## build-up: stops docker-compose (if running), builds all projects and starts docker compose
 build-up: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter
 	@echo "Stopping docker images (if running...)"
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev down
+	docker-compose -f ./docker-compose.yml --env-file ./.env down
 	@echo "Building (when required) and starting docker images..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d
 	@echo "Docker images built and started!"
 
 # build-dockerfiles: builds all dockerfile images
@@ -93,73 +93,73 @@ build-adapter:
 ## gw: stops API Gateway, removes docker image, builds service, and starts it
 gw:
 	@echo "Building api-gateway docker image..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop api-gateway
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f api-gateway
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d api-gateway
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start api-gateway
+	docker-compose -f ./docker-compose.yml --env-file ./.env stop api-gateway
+	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f api-gateway
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d api-gateway
+	docker-compose -f ./docker-compose.yml --env-file ./.env start api-gateway
 	@echo "api-gateway built and started!"
 
 ## auth: stops auth-service, removes docker image, builds service, and starts it
 auth: build-auth
 	@echo "Building auth-service docker image..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop auth-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f auth-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d auth-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start auth-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env stop auth-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f auth-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d auth-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env start auth-service
 	@echo "auth-service built and started!"
 
 ## project: stops project-service, removes docker image, builds service, and starts it
 project: build-project
 	@echo "Building project-service docker image..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop project-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f project-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d project-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start project-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env stop project-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f project-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d project-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env start project-service
 	@echo "project-service built and started!"
 	
 ## checkmail: stops checkmail-service, removes docker image, builds service, and starts it
 checkmail: build-checkmail
 	@echo "Building checkmail-service docker image..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop checkmail-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f checkmail-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d checkmail-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start checkmail-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env stop checkmail-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f checkmail-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d checkmail-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env start checkmail-service
 	@echo "checkmail-service built and started!"
 
 ## mail: stops mail-service, removes docker image, builds service, and starts it
 mail: build-mail
 	@echo "Building mail-service docker image..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop mail-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f mail-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d mail-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start mail-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env stop mail-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f mail-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d mail-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env start mail-service
 	@echo "mail-service built and started!"
 
 ## lookup: stops lookup-service, removes docker image, builds service, and starts it
 lookup: build-lookup
 	@echo "Building lookup-service docker image..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop lookup-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f lookup-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d lookup-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start lookup-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env stop lookup-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f lookup-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d lookup-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env start lookup-service
 	@echo "lookup-service built and started!"
 
 ## recaptcha: stops recaptcha-service, removes docker image, builds service, and starts it
 recaptcha: build-recaptcha
 	@echo "Building recaptcha-service docker image..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop recaptcha-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f recaptcha-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d recaptcha-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start recaptcha-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env stop recaptcha-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f recaptcha-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d recaptcha-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env start recaptcha-service
 	@echo "recaptcha-service built and started!"
 
 ## adapter: stops adapter-service, removes docker image, builds service, and starts it
 adapter: build-adapter
 	@echo "Building adapter-service docker image..."
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev stop adapter-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev rm -f adapter-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev up --build -d adapter-service
-	docker-compose -f ./docker-compose.dev.yml --env-file ./.env.dev start adapter-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env stop adapter-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f adapter-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d adapter-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env start adapter-service
 	@echo "adapter-service built and started!"
 
 ## clean: runs go clean and deletes binaries
