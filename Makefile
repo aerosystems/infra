@@ -15,6 +15,8 @@ RECAPTCHA_BINARY=recaptcha-service.bin
 RECAPTCHA_VERSION=1.0.0
 ADAPTER_BINARY=adapter-service.bin
 ADAPTER_VERSION=1.0.0
+STAT_BINARY=stat-service.bin
+STAT_VERSION=1.0.0
 
 ## up: starts all containers in the background without forcing build
 up:
@@ -29,7 +31,7 @@ down:
 	@echo "Docker stopped!"
 
 ## build-up: stops docker-compose (if running), builds all projects and starts docker compose
-build-up: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter
+build-up: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter build-stat
 	@echo "Stopping docker images (if running...)"
 	docker-compose -f ./docker-compose.yml --env-file ./.env down
 	@echo "Building (when required) and starting docker images..."
@@ -37,7 +39,7 @@ build-up: build-auth build-project build-checkmail build-mail build-lookup build
 	@echo "Docker images built and started!"
 
 # build-dockerfiles: builds all dockerfile images
-build-dockerfiles: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter
+build-dockerfiles: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter build-stat
 	@echo "Building dockerfiles..."
 	docker build -f ../auth-service/Dockerfile -t ${CONTAINER_REPOSITORY}/auth-service:${AUTH_VERSION} ../
 	docker build -f ../project-service/Dockerfile -t ${CONTAINER_REPOSITORY}/project-service:${PROJECT_VERSION} ../
@@ -46,6 +48,7 @@ build-dockerfiles: build-auth build-project build-checkmail build-mail build-loo
 	docker build -f ../lookup-service/Dockerfile -t ${CONTAINER_REPOSITORY}/lookup-service:${LOOKUP_VERSION} ../
 	docker build -f ../recaptcha-service/Dockerfile -t ${CONTAINER_REPOSITORY}/recaptcha-service:${RECAPTCHA_VERSION} ../
 	docker build -f ../adapter-service/Dockerfile -t ${CONTAINER_REPOSITORY}/adapter-service:${ADAPTER_VERSION} ../
+	docker build -f ../stat-service/Dockerfile -t ${CONTAINER_REPOSITORY}/stat-service:${STAT_VERSION} ../
 	@echo "Dockerfiles built!"
 
 ## build-auth: builds the authentication binary as a linux executable
@@ -89,6 +92,12 @@ build-adapter:
 	@echo "Building adapter-service binary.."
 	cd ../adapter-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${ADAPTER_BINARY} ./cmd/api/*
 	@echo "adapter-service binary built!"
+
+## build-stat: builds the stat-service binary as a linux executable
+build-stat:
+	@echo "Building stat-service binary.."
+	cd ../stat-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${STAT_BINARY} ./cmd/api/*
+	@echo "stat-service binary built!"
 
 ## gw: stops API Gateway, removes docker image, builds service, and starts it
 gw:
@@ -162,6 +171,15 @@ adapter: build-adapter
 	docker-compose -f ./docker-compose.yml --env-file ./.env start adapter-service
 	@echo "adapter-service built and started!"
 
+## stat: stops stat-service, removes docker image, builds service, and starts it
+stat: build-stat
+	@echo "Building stat-service docker image..."
+	docker-compose -f ./docker-compose.yml --env-file ./.env stop stat-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f stat-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d stat-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env start stat-service
+	@echo "stat-service built and started!"
+
 ## clean: runs go clean and deletes binaries
 clean:
 	@echo "Cleaning..."
@@ -179,6 +197,8 @@ clean:
 	@cd ../recapthca-service && go clean
 	@cd ../adapter-service && rm -f ${ADAPTER_BINARY}
 	@cd ../adapter-service && go clean
+	@cd ../stat-service && rm -f ${STAT_BINARY}
+	@cd ../stat-service && go clean
 	@echo "Cleaned!"
 
 ## doc: generating Swagger Docs
@@ -191,6 +211,7 @@ doc:
 	cd ../lookup-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../recaptcha-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../adapter-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../stat-service; swag init -g ./cmd/api/main.go -o ./docs
 
 	@echo "Swagger Docs prepared, look at /docs"
 

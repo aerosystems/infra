@@ -198,6 +198,22 @@ services:
       BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
       ACCESS_SECRET_PROXY: ${ACCESS_SECRET_PROXY}
 
+  stat-service:
+    hostname: stat-service
+    container_name: stat-service
+    build:
+      context: ../
+      dockerfile: ./stat-service/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8088:80"
+    volumes:
+      - "../data/logs:/app/logs"
+    environment:
+      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
+      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
+      ACCESS_SECRET: ${ACCESS_SECRET}
+
   filebeat:
     hostname: filebeat
     container_name: filebeat
