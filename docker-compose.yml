@@ -209,11 +209,14 @@ services:
       - "8088:80"
     volumes:
       - "../data/logs:/app/logs"
+      - "../data/elk/certs/es01:/app/certs"
     environment:
       BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
       BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
       ACCESS_SECRET: ${ACCESS_SECRET}
       ELASTIC_HOST: ${ELASTIC_HOST}
+    networks:
+      - log_network
 
   filebeat:
     hostname: filebeat
