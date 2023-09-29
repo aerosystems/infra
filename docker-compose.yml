@@ -215,8 +215,10 @@ services:
       BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
       ACCESS_SECRET: ${ACCESS_SECRET}
       ELASTIC_HOST: ${ELASTIC_HOST}
+      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
     networks:
       - log_network
+      - default
 
   filebeat:
     hostname: filebeat
