@@ -3,6 +3,8 @@ filebeat.inputs:
     id: default-filestream
     paths:
       - ingest_data/*.log
+    json.keys_under_root: true
+    json.add_error_key: true
 
 filebeat.autodiscover:
   providers:
