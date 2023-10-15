@@ -17,6 +17,8 @@ ADAPTER_BINARY=adapter-service.bin
 ADAPTER_VERSION=1.0.0
 STAT_BINARY=stat-service.bin
 STAT_VERSION=1.0.0
+SUBS_BINARY=subs-service.bin
+SUBS_VERSION=1.0.0
 
 ## up: starts all containers in the background without forcing build
 up:
@@ -31,7 +33,7 @@ down:
 	@echo "Docker stopped!"
 
 ## build-up: stops docker-compose (if running), builds all projects and starts docker compose
-build-up: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter build-stat
+build-up: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter build-stat build-subs
 	@echo "Stopping docker images (if running...)"
 	docker-compose -f ./docker-compose.yml --env-file ./.env down
 	@echo "Building (when required) and starting docker images..."
@@ -39,7 +41,7 @@ build-up: build-auth build-project build-checkmail build-mail build-lookup build
 	@echo "Docker images built and started!"
 
 # build-dockerfiles: builds all dockerfile images
-build-dockerfiles: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter build-stat
+build-dockerfiles: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter build-stat build-subs
 	@echo "Building dockerfiles..."
 	docker build -f ../auth-service/Dockerfile -t ${CONTAINER_REPOSITORY}/auth-service:${AUTH_VERSION} ../
 	docker build -f ../project-service/Dockerfile -t ${CONTAINER_REPOSITORY}/project-service:${PROJECT_VERSION} ../
@@ -98,6 +100,12 @@ build-stat:
 	@echo "Building stat-service binary.."
 	cd ../stat-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${STAT_BINARY} ./cmd/api/*
 	@echo "stat-service binary built!"
+
+## build-subs: builds the subs-service binary as a linux executable
+build-subs:
+	@echo "Building subs-service binary.."
+	cd ../subs-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${SUBS_BINARY} ./cmd/api/*
+	@echo "subs-service binary built!"
 
 ## gw: stops API Gateway, removes docker image, builds service, and starts it
 gw:
@@ -180,6 +188,15 @@ stat: build-stat
 	docker-compose -f ./docker-compose.yml --env-file ./.env start stat-service
 	@echo "stat-service built and started!"
 
+## subs: stops subs-service, removes docker image, builds service, and starts it
+subs: build-subs
+	@echo "Building subs-service docker image..."
+	docker-compose -f ./docker-compose.yml --env-file ./.env stop subs-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f subs-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d subs-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env start subs-service
+	@echo "subs-service built and started!"
+
 ## clean: runs go clean and deletes binaries
 clean:
 	@echo "Cleaning..."
@@ -199,6 +216,8 @@ clean:
 	@cd ../adapter-service && go clean
 	@cd ../stat-service && rm -f ${STAT_BINARY}
 	@cd ../stat-service && go clean
+	@cd ../subs-service && rm -f ${SUBS_BINARY}
+	@cd ../subs-service && go clean
 	@echo "Cleaned!"
 
 ## doc: generating Swagger Docs
@@ -212,6 +231,7 @@ doc:
 	cd ../recaptcha-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../adapter-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../stat-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../subs-service; swag init -g ./cmd/api/main.go -o ./docs
 
 	@echo "Swagger Docs prepared, look at /docs"
 

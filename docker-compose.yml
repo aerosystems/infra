@@ -220,6 +220,29 @@ services:
       - log_network
       - default
 
+  # subs-service - store and retrieve subscriptions
+  subs-service:
+    container_name: subs-service
+    hostname: subs-service
+    build:
+      context: ../
+      dockerfile: ./subs-service/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "8089:80"
+    expose:
+      - "5001"
+    volumes:
+      - "../data/logs:/app/logs"
+    environment:
+      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
+      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
+      POSTGRES_DSN: ${SUBS_POSTGRES_DSN}
+      APP_ENV: ${APP_ENV}
+      ACCESS_SECRET: ${ACCESS_SECRET}
+
   filebeat:
     hostname: filebeat
     container_name: filebeat
