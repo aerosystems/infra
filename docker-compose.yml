@@ -243,13 +243,13 @@ services:
       APP_ENV: ${APP_ENV}
       ACCESS_SECRET: ${ACCESS_SECRET}
 
-  # user-service - manage users
-  user-service:
-    container_name: user-service
-    hostname: user-service
+  # customer-service - manage users
+  customer-service:
+    container_name: customer-service
+    hostname: customer-service
     build:
       context: ../
-      dockerfile: ./user-service/Dockerfile
+      dockerfile: ./customer-service/Dockerfile
     restart: unless-stopped
     depends_on:
       - postgres
@@ -262,7 +262,7 @@ services:
     environment:
       BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
       BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
-      POSTGRES_DSN: ${USER_POSTGRES_DSN}
+      POSTGRES_DSN: ${CUSTOMER_POSTGRES_DSN}
       APP_ENV: ${APP_ENV}
       ACCESS_SECRET: ${ACCESS_SECRET}
 

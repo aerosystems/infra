@@ -19,8 +19,8 @@ STAT_BINARY=stat-service.bin
 STAT_VERSION=1.0.0
 SUBS_BINARY=subs-service.bin
 SUBS_VERSION=1.0.0
-USER_BINARY=user-service.bin
-USER_VERSION=1.0.0
+CUSTOMER_BINARY=customer-service.bin
+CUSTOMER_VERSION=1.0.0
 
 ## up: starts all containers in the background without forcing build
 up:
@@ -35,7 +35,7 @@ down:
 	@echo "Docker stopped!"
 
 ## build-up: stops docker-compose (if running), builds all projects and starts docker compose
-build-up: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter build-stat build-subs build-user
+build-up: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter build-stat build-subs build-customer
 	@echo "Stopping docker images (if running...)"
 	docker-compose -f ./docker-compose.yml --env-file ./.env down
 	@echo "Building (when required) and starting docker images..."
@@ -43,7 +43,7 @@ build-up: build-auth build-project build-checkmail build-mail build-lookup build
 	@echo "Docker images built and started!"
 
 # build-dockerfiles: builds all dockerfile images
-build-dockerfiles: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter build-stat build-subs build-user
+build-dockerfiles: build-auth build-project build-checkmail build-mail build-lookup build-recaptcha build-adapter build-stat build-subs build-customer
 	@echo "Building dockerfiles..."
 	docker build -f ../auth-service/Dockerfile -t ${CONTAINER_REPOSITORY}/auth-service:${AUTH_VERSION} ../
 	docker build -f ../project-service/Dockerfile -t ${CONTAINER_REPOSITORY}/project-service:${PROJECT_VERSION} ../
@@ -54,7 +54,7 @@ build-dockerfiles: build-auth build-project build-checkmail build-mail build-loo
 	docker build -f ../adapter-service/Dockerfile -t ${CONTAINER_REPOSITORY}/adapter-service:${ADAPTER_VERSION} ../
 	docker build -f ../stat-service/Dockerfile -t ${CONTAINER_REPOSITORY}/stat-service:${STAT_VERSION} ../
 	docker build -f ../subs-service/Dockerfile -t ${CONTAINER_REPOSITORY}/subs-service:${SUBS_VERSION} ../
-	docker build -f ../user-service/Dockerfile -t ${CONTAINER_REPOSITORY}/user-service:${USER_VERSION} ../
+	docker build -f ../customer-service/Dockerfile -t ${CONTAINER_REPOSITORY}/customer-service:${CUSTOMER_VERSION} ../
 	@echo "Dockerfiles built!"
 
 ## build-auth: builds the authentication binary as a linux executable
@@ -111,11 +111,11 @@ build-subs:
 	cd ../subs-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${SUBS_BINARY} ./cmd/api/*
 	@echo "subs-service binary built!"
 
-## build-user: builds the user-service binary as a linux executable
-build-user:
-	@echo "Building user-service binary.."
-	cd ../user-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${USER_BINARY} ./cmd/api/*
-	@echo "user-service binary built!"
+## build-customer: builds the customer-service binary as a linux executable
+build-customer:
+	@echo "Building customer-service binary.."
+	cd ../customer-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${CUSTOMER_BINARY} ./cmd/api/*
+	@echo "customer-service binary built!"
 
 ## gw: stops API Gateway, removes docker image, builds service, and starts it
 gw:
@@ -207,14 +207,14 @@ subs: build-subs
 	docker-compose -f ./docker-compose.yml --env-file ./.env start subs-service
 	@echo "subs-service built and started!"
 
-## user: stops user-service, removes docker image, builds service, and starts it
-user: build-user
-	@echo "Building user-service docker image..."
-	docker-compose -f ./docker-compose.yml --env-file ./.env stop user-service
-	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f user-service
-	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d user-service
-	docker-compose -f ./docker-compose.yml --env-file ./.env start user-service
-	@echo "user-service built and started!"
+## customer: stops customer-service, removes docker image, builds service, and starts it
+customer: build-customer
+	@echo "Building customer-service docker image..."
+	docker-compose -f ./docker-compose.yml --env-file ./.env stop customer-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f customer-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d customer-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env start customer-service
+	@echo "customer-service built and started!"
 
 ## clean: runs go clean and deletes binaries
 clean:
@@ -237,8 +237,8 @@ clean:
 	@cd ../stat-service && go clean
 	@cd ../subs-service && rm -f ${SUBS_BINARY}
 	@cd ../subs-service && go clean
-	@cd ../user-service && rm -f ${USER_BINARY}
-	@cd ../user-service && go clean
+	@cd ../customer-service && rm -f ${CUSTOMER_BINARY}
+	@cd ../customer-service && go clean
 	@echo "Cleaned!"
 
 ## doc: generating Swagger Docs
@@ -253,7 +253,7 @@ doc:
 	cd ../adapter-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../stat-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../subs-service; swag init -g ./cmd/api/main.go -o ./docs
-	cd ../user-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../customer-service; swag init -g ./cmd/api/main.go -o ./docs
 	@echo "Swagger Docs prepared, look at /docs"
 
 ## help: displays help
