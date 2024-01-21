@@ -242,6 +242,7 @@ services:
       POSTGRES_DSN: ${SUBS_POSTGRES_DSN}
       APP_ENV: ${APP_ENV}
       ACCESS_SECRET: ${ACCESS_SECRET}
+      MONOBANK_X_TOKEN: ${MONOBANK_X_TOKEN}
 
   # customer-service - manage users
   customer-service:
