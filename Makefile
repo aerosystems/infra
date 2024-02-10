@@ -72,7 +72,7 @@ build-project:
 ## build-checkmail: builds the checkmail-service binary as a linux executable
 build-checkmail:
 	@echo "Building checkmail-service binary.."
-	cd ../checkmail-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${CHECKMAIL_BINARY} ./cmd/api/*
+	cd ../checkmail-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${CHECKMAIL_BINARY} ./cmd/app
 	@echo "checkmail-service binary built!"
 
 ## build-mail: builds the mail-service binary as a linux executable

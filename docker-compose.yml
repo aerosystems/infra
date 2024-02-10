@@ -92,16 +92,8 @@ services:
       - postgres
     ports:
       - "8083:80"
-    environment:
-      POSTGRES_DSN: ${CHECKMAIL_POSTGRES_DSN}
-      APP_ENV: ${APP_ENV}
-      ACCESS_SECRET: ${ACCESS_SECRET}
-      TRUST_DOMAIN_TYPES: ${TRUST_DOMAIN_TYPES}
-      TRUST_DOMAIN_COVERAGES: ${TRUST_DOMAIN_COVERAGES}
-      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
-      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
-      TG_BOT_TOKEN: ${TG_BOT_TOKEN}
     volumes:
+      - ".env:/app/.env"
       - "../data/logs:/app/logs"
 
   # mail-service - sends emails
@@ -115,7 +107,7 @@ services:
     depends_on:
       - mailhog
     ports:
-        - "8086:80"
+      - "8086:80"
     expose:
       - "5001"
     environment:
@@ -141,23 +133,23 @@ services:
     build:
       context: ../
       dockerfile: ./lookup-service/Dockerfile
-#      dockerfile: ./lookup-service/Dockerfile.debug
+    #      dockerfile: ./lookup-service/Dockerfile.debug
     restart: unless-stopped
     depends_on:
       - postgres
     ports:
       - "8084:80"
-#      - "40000:40000"
+    #      - "40000:40000"
     expose:
       - "5001"
     volumes:
       - "../data/logs:/app/logs"
     environment:
-        BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
-        BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
-        POSTGRES_DSN: ${LOOKUP_POSTGRES_DSN}
-        APP_ENV: ${APP_ENV}
-        ACCESS_SECRET: ${ACCESS_SECRET}
+      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
+      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
+      POSTGRES_DSN: ${LOOKUP_POSTGRES_DSN}
+      APP_ENV: ${APP_ENV}
+      ACCESS_SECRET: ${ACCESS_SECRET}
 
   # recaptcha-service - checks reCAPTCHA tokens
   recaptcha-service:
