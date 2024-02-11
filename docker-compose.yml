@@ -48,7 +48,6 @@ services:
       ACCESS_EXP_MINUTES: ${ACCESS_EXP_MINUTES}
       REFRESH_SECRET: ${REFRESH_SECRET}
       REFRESH_EXP_MINUTES: ${REFRESH_EXP_MINUTES}
-      TRUST_ROLES: ${TRUST_ROLES}
       GOOGLEMAIL_DOMAINS: ${GOOGLEMAIL_DOMAINS}
       CODE_EXP_MINUTES: ${CODE_EXP_MINUTES}
       BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
@@ -85,8 +84,8 @@ services:
     container_name: checkmail-service
     hostname: checkmail-service
     build:
-      context: ../
-      dockerfile: ./checkmail-service/Dockerfile
+      context: ../checkmail-service
+      dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
       - postgres
