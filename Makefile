@@ -60,7 +60,7 @@ build-dockerfiles: build-auth build-project build-checkmail build-mail build-loo
 ## build-auth: builds the authentication binary as a linux executable
 build-auth:
 	@echo "Building authentication binary.."
-	cd ../auth-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${AUTH_BINARY} ./cmd/api/*
+	cd ../auth-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${AUTH_BINARY} ./cmd/app
 	@echo "Authentication binary built!"
 
 ## build-project: builds the project-service binary as a linux executable
@@ -244,10 +244,10 @@ clean:
 ## doc: generating Swagger Docs
 doc:
 	@echo "Stopping generating Swagger Docs..."
-	cd ../auth-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../auth-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../project-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../mail-service; swag init -g ./cmd/app/main.go -o ./docs
-	cd ../checkmail-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../checkmail-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../lookup-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../recaptcha-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../adapter-service; swag init -g ./cmd/api/main.go -o ./docs

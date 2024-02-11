@@ -32,28 +32,16 @@ services:
     container_name: auth-service
     hostname: auth-service
     build:
-      context: ../
-      dockerfile: ./auth-service/Dockerfile
+      context: ../auth-service
+      dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
       - postgres
       - redis
     ports:
       - "8081:80"
-    environment:
-      POSTGRES_DSN: ${AUTH_POSTGRES_DSN}
-      REDIS_DSN: ${REDIS_DSN}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-      ACCESS_SECRET: ${ACCESS_SECRET}
-      ACCESS_EXP_MINUTES: ${ACCESS_EXP_MINUTES}
-      REFRESH_SECRET: ${REFRESH_SECRET}
-      REFRESH_EXP_MINUTES: ${REFRESH_EXP_MINUTES}
-      GOOGLEMAIL_DOMAINS: ${GOOGLEMAIL_DOMAINS}
-      CODE_EXP_MINUTES: ${CODE_EXP_MINUTES}
-      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
-      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
-      APP_ENV: ${APP_ENV}
     volumes:
+      - "../auth-service/.env:/app/.env"
       - "../data/logs:/app/logs"
 
   # project-service - handles user projects
@@ -92,7 +80,7 @@ services:
     ports:
       - "8083:80"
     volumes:
-      - ".env:/app/.env"
+      - "../checkmail-service/.env:/app/.env"
       - "../data/logs:/app/logs"
 
   # mail-service - sends emails
