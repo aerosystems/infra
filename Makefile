@@ -114,7 +114,7 @@ build-subs:
 ## build-customer: builds the customer-service binary as a linux executable
 build-customer:
 	@echo "Building customer-service binary.."
-	cd ../customer-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${CUSTOMER_BINARY} ./cmd/api/*
+	cd ../customer-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${CUSTOMER_BINARY} ./cmd/app
 	@echo "customer-service binary built!"
 
 ## gw: stops API Gateway, removes docker image, builds service, and starts it
@@ -253,7 +253,7 @@ doc:
 	cd ../adapter-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../stat-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../subs-service; swag init -g ./cmd/api/main.go -o ./docs
-	cd ../customer-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../customer-service; swag init -g ./cmd/app/main.go -o ./docs
 	@echo "Swagger Docs prepared, look at /docs"
 
 ## help: displays help

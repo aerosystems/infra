@@ -228,8 +228,8 @@ services:
     container_name: customer-service
     hostname: customer-service
     build:
-      context: ../
-      dockerfile: ./customer-service/Dockerfile
+      context: ./customer-service
+      dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
       - postgres
@@ -238,13 +238,8 @@ services:
     expose:
       - "5001"
     volumes:
+      - "../customer-service/.env:/app/.env"
       - "../data/logs:/app/logs"
-    environment:
-      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
-      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
-      POSTGRES_DSN: ${CUSTOMER_POSTGRES_DSN}
-      APP_ENV: ${APP_ENV}
-      ACCESS_SECRET: ${ACCESS_SECRET}
 
   filebeat:
     hostname: filebeat
