@@ -49,8 +49,8 @@ services:
     container_name: project-service
     hostname: project-service
     build:
-      context: ../
-      dockerfile: ./project-service/Dockerfile
+      context: ./
+      dockerfile: /Dockerfile
     restart: unless-stopped
     depends_on:
       - postgres
@@ -58,13 +58,8 @@ services:
       - "8082:80"
     expose:
       - "5001"
-    environment:
-      POSTGRES_DSN: ${PROJECT_POSTGRES_DSN}
-      APP_ENV: ${APP_ENV}
-      ACCESS_SECRET: ${ACCESS_SECRET}
-      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
-      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
     volumes:
+      - "../project-service/.env:/app/.env"
       - "../data/logs:/app/logs"
 
   # checkmail-service - handles domain & emails
