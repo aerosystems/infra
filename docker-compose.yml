@@ -199,8 +199,8 @@ services:
     container_name: subs-service
     hostname: subs-service
     build:
-      context: ../
-      dockerfile: ./subs-service/Dockerfile
+      context: ../subs-service
+      dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
       - postgres
@@ -209,14 +209,8 @@ services:
     expose:
       - "5001"
     volumes:
+      - "../subs-service/.env:/app/.env"
       - "../data/logs:/app/logs"
-    environment:
-      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
-      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
-      POSTGRES_DSN: ${SUBS_POSTGRES_DSN}
-      APP_ENV: ${APP_ENV}
-      ACCESS_SECRET: ${ACCESS_SECRET}
-      MONOBANK_X_TOKEN: ${MONOBANK_X_TOKEN}
 
   # customer-service - manage users
   customer-service:
