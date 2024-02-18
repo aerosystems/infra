@@ -122,7 +122,7 @@ stat-build:
 ## subs-build: builds the subs-service binary as a linux executable
 subs-build:
 	@echo "Building subs-service binary.."
-	cd ../subs-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${SUBS_BINARY} ./cmd/api/*
+	cd ../subs-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${SUBS_BINARY} ./cmd/app
 	@echo "subs-service binary built!"
 
 ## customer-build: builds the customer-service binary as a linux executable
@@ -266,7 +266,7 @@ doc:
 	cd ../recaptcha-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../adapter-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../stat-service; swag init -g ./cmd/api/main.go -o ./docs
-	cd ../subs-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../subs-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../customer-service; swag init -g ./cmd/app/main.go -o ./docs
 	@echo "Swagger Docs prepared, look at /docs"
 
