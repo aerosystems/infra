@@ -113,9 +113,9 @@ services:
     container_name: lookup-service
     hostname: lookup-service
     build:
-      context: ../
-      dockerfile: ./lookup-service/Dockerfile
-    #      dockerfile: ./lookup-service/Dockerfile.debug
+      context: ./lookup-service
+      dockerfile: Dockerfile
+    #      dockerfile: Dockerfile.debug
     restart: unless-stopped
     depends_on:
       - postgres
@@ -125,13 +125,8 @@ services:
     expose:
       - "5001"
     volumes:
+      - "../lookup-service/.env:/app/.env"
       - "../data/logs:/app/logs"
-    environment:
-      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
-      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
-      POSTGRES_DSN: ${LOOKUP_POSTGRES_DSN}
-      APP_ENV: ${APP_ENV}
-      ACCESS_SECRET: ${ACCESS_SECRET}
 
   # recaptcha-service - checks reCAPTCHA tokens
   recaptcha-service:

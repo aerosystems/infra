@@ -98,7 +98,7 @@ mail-build:
 ## lookup-build: builds the lookup-service binary as a linux executable
 lookup-build:
 	@echo "Building lookup-service binary.."
-	cd ../lookup-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${LOOKUP_BINARY} ./cmd/app/*
+	cd ../lookup-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${LOOKUP_BINARY} ./cmd/app
 	@echo "lookup-service binary built!"
 
 ## recaptcha-build: builds the recaptcha-service binary as a linux executable
