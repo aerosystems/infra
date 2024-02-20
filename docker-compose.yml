@@ -153,19 +153,16 @@ services:
     hostname: adapter-service
     container_name: adapter-service
     build:
-      context: ../
-      dockerfile: ./adapter-service/Dockerfile
+      context: ./adapter-service
+      dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
       - checkmail-service
     ports:
       - "8087:80"
     volumes:
+      - "../adapter-service/.env:/app/.env"
       - "../data/logs:/app/logs"
-    environment:
-      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
-      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
-      ACCESS_SECRET_PROXY: ${ACCESS_SECRET_PROXY}
 
   stat-service:
     hostname: stat-service
