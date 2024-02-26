@@ -104,7 +104,7 @@ lookup-build:
 ## recaptcha-build: builds the recaptcha-service binary as a linux executable
 recaptcha-build:
 	@echo "Building recaptcha-service binary.."
-	cd ../recaptcha-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${RECAPTCHA_BINARY} ./cmd/api/*
+	cd ../recaptcha-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${RECAPTCHA_BINARY} ./cmd/app
 	@echo "recaptcha-service binary built!"
 
 ## adapter-build: builds the adapter-service binary as a linux executable
@@ -263,7 +263,7 @@ doc:
 	cd ../mail-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../checkmail-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../lookup-service; swag init -g ./cmd/app/main.go -o ./docs
-	cd ../recaptcha-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../recaptcha-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../adapter-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../stat-service; swag init -g ./cmd/api/main.go -o ./docs
 	cd ../subs-service; swag init -g ./cmd/app/main.go -o ./docs

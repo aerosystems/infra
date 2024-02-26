@@ -133,27 +133,20 @@ services:
     container_name: recaptcha-service
     hostname: recaptcha-service
     build:
-      context: ../
-      dockerfile: ./recaptcha-service/Dockerfile
+      context: ../recaptcha-service
+      dockerfile: Dockerfile
     restart: unless-stopped
-    depends_on:
-      - postgres
     ports:
       - "8085:80"
     volumes:
+      - "../recaptcha-service/.env:/app/.env"
       - "../data/logs:/app/logs"
-    environment:
-      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
-      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
-      APP_ENV: ${APP_ENV}
-      RECAPTCHA_V2_SECRET: ${RECAPTCHA_V2_SECRET}
-      RECAPTCHA_V3_SECRET: ${RECAPTCHA_V3_SECRET}
 
   adapter-service:
     hostname: adapter-service
     container_name: adapter-service
     build:
-      context: ./adapter-service
+      context: ../adapter-service
       dockerfile: Dockerfile
     restart: unless-stopped
     depends_on:
