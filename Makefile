@@ -92,7 +92,7 @@ checkmail-build:
 ## mail-build: builds the mail-service binary as a linux executable
 mail-build:
 	@echo "Building mail-service binary.."
-	cd ../mail-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${MAIL_BINARY} ./cmd/app/*
+	cd ../mail-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${MAIL_BINARY} ./cmd/app
 	@echo "mail-service binary built!"
 
 ## lookup-build: builds the lookup-service binary as a linux executable
@@ -257,7 +257,7 @@ clean:
 
 ## doc: generating Swagger Docs
 doc:
-	@echo "Stopping generating Swagger Docs..."
+	@echo "Starting generating Swagger Docs..."
 	cd ../auth-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../project-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../mail-service; swag init -g ./cmd/app/main.go -o ./docs
