@@ -116,7 +116,7 @@ adapter-build:
 ## stat-build: builds the stat-service binary as a linux executable
 stat-build:
 	@echo "Building stat-service binary.."
-	cd ../stat-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${STAT_BINARY} ./cmd/api/*
+	cd ../stat-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${STAT_BINARY} ./cmd/app
 	@echo "stat-service binary built!"
 
 ## subs-build: builds the subs-service binary as a linux executable
@@ -265,7 +265,7 @@ doc:
 	cd ../lookup-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../recaptcha-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../adapter-service; swag init -g ./cmd/app/main.go -o ./docs
-	cd ../stat-service; swag init -g ./cmd/api/main.go -o ./docs
+	cd ../stat-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../subs-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../customer-service; swag init -g ./cmd/app/main.go -o ./docs
 	@echo "Swagger Docs prepared, look at /docs"

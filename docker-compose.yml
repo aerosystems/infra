@@ -149,20 +149,15 @@ services:
     hostname: stat-service
     container_name: stat-service
     build:
-      context: ../
-      dockerfile: ./stat-service/Dockerfile
+      context: ../stat-service
+      dockerfile: Dockerfile
     restart: unless-stopped
     ports:
       - "8088:80"
     volumes:
+      - "../stat-service/.env:/app/.env"
       - "../data/logs:/app/logs"
       - "../data/elk/certs/es01:/app/certs"
-    environment:
-      BASIC_AUTH_DOCS_USERNAME: ${BASIC_AUTH_DOCS_USERNAME}
-      BASIC_AUTH_DOCS_PASSWORD: ${BASIC_AUTH_DOCS_PASSWORD}
-      ACCESS_SECRET: ${ACCESS_SECRET}
-      ELASTIC_HOST: ${ELASTIC_HOST}
-      ELASTIC_PASSWORD: ${ELASTIC_PASSWORD}
     networks:
       - log_network
       - default
