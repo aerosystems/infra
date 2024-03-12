@@ -201,7 +201,7 @@ services:
   filebeat:
     hostname: filebeat
     container_name: filebeat
-    image: docker.ElasticClient.co/beats/filebeat:${STACK_VERSION}
+    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
     user: root
     volumes:
       - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
@@ -209,7 +209,7 @@ services:
       - "../data/logs:/usr/share/filebeat/ingest_data"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     environment:
-      - ELASTIC_USER=ElasticClient
+      - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ELASTIC_HOSTS=https://es01:9200
       - KIBANA_HOSTS=http://kibana:5601
