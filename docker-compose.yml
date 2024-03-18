@@ -244,6 +244,16 @@ services:
     volumes:
       - ../data/redis:/data
 
+  firestore:
+    container_name: firestore
+    build:
+      context: ../firestore-emulator
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "4000:4000"
+    restart: unless-stopped
+
   # mailhog: a fake smtp server with a web interface
   mailhog:
     container_name: mailhog
