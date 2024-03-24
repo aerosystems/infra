@@ -254,6 +254,15 @@ services:
       - "4000:4000"
     restart: unless-stopped
 
+  pubsub:
+    container_name: pubsub
+    build:
+      context: ../pubsub-emulator
+      dockerfile: Dockerfile
+    ports:
+      - "8885:8085"
+    restart: unless-stopped
+
   # mailhog: a fake smtp server with a web interface
   mailhog:
     container_name: mailhog
