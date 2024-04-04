@@ -198,24 +198,24 @@ services:
       - "../customer-service/.env:/app/.env"
       - "../data/logs:/app/logs"
 
-  filebeat:
-    hostname: filebeat
-    container_name: filebeat
-    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
-    user: root
-    volumes:
-      - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
-      - "../data/elk/certs:/usr/share/filebeat/certs"
-      - "../data/logs:/usr/share/filebeat/ingest_data"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    environment:
-      - ELASTIC_USER=elastic
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - ELASTIC_HOSTS=https://es01:9200
-      - KIBANA_HOSTS=http://kibana:5601
-      - LOGSTASH_HOSTS=http://logstash01:9600
-    networks:
-      - log_network
+#  filebeat:
+#    hostname: filebeat
+#    container_name: filebeat
+#    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+#    user: root
+#    volumes:
+#      - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+#      - "../data/elk/certs:/usr/share/filebeat/certs"
+#      - "../data/logs:/usr/share/filebeat/ingest_data"
+#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#    environment:
+#      - ELASTIC_USER=elastic
+#      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+#      - ELASTIC_HOSTS=https://es01:9200
+#      - KIBANA_HOSTS=http://kibana:5601
+#      - LOGSTASH_HOSTS=http://logstash01:9600
+#    networks:
+#      - log_network
 
   # postgres: start Postgres, and ensure that data is stored to a mounted volume
   postgres:
