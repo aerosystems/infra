@@ -244,7 +244,7 @@ services:
     volumes:
       - ../data/redis:/data
 
-  firestore:
+  firesotre:
     container_name: firestore
     build:
       context: ../firestore-emulator
