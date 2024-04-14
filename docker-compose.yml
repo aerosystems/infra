@@ -43,6 +43,8 @@ services:
     volumes:
       - "../auth-service/.env:/app/.env"
       - "../data/logs:/app/logs"
+    env_file:
+      - ../auth-service/.env
 
   # project-service - handles user projects
   project-service:
@@ -61,6 +63,8 @@ services:
     volumes:
       - "../project-service/.env:/app/.env"
       - "../data/logs:/app/logs"
+    env_file:
+      - ../project-service/.env
 
   # checkmail-service - handles domain & emails
   checkmail-service:
@@ -77,6 +81,8 @@ services:
     volumes:
       - "../checkmail-service/.env:/app/.env"
       - "../data/logs:/app/logs"
+    env_file:
+      - ../checkmail-service/.env
 
   # mail-service - sends emails
   mail-service:
@@ -95,6 +101,8 @@ services:
     volumes:
       - "../mail-service/.env:/app/.env"
       - "../data/logs:/app/logs"
+    env_file:
+      - ../mail-service/.env
 
   # lookup-service - determines email domain type
   lookup-service:
@@ -115,6 +123,8 @@ services:
     volumes:
       - "../lookup-service/.env:/app/.env"
       - "../data/logs:/app/logs"
+    env_file:
+      - ../lookup-service/.env
 
   # recaptcha-service - checks reCAPTCHA tokens
   recaptcha-service:
@@ -129,6 +139,8 @@ services:
     volumes:
       - "../recaptcha-service/.env:/app/.env"
       - "../data/logs:/app/logs"
+    env_file:
+      - ../recaptcha-service/.env
 
   adapter-service:
     hostname: adapter-service
@@ -144,6 +156,8 @@ services:
     volumes:
       - "../adapter-service/.env:/app/.env"
       - "../data/logs:/app/logs"
+    env_file:
+      - ../adapter-service/.env
 
   stat-service:
     hostname: stat-service
@@ -161,6 +175,8 @@ services:
     networks:
       - log_network
       - default
+    env_file:
+      - ../stat-service/.env
 
   # subs-service - store and retrieve subscriptions
   subs-service:
@@ -179,6 +195,8 @@ services:
     volumes:
       - "../subs-service/.env:/app/.env"
       - "../data/logs:/app/logs"
+    env_file:
+      - ../subs-service/.env
 
   # customer-service - manage users
   customer-service:
@@ -200,24 +218,24 @@ services:
     env_file:
       - ../customer-service/.env
 
-#  filebeat:
-#    hostname: filebeat
-#    container_name: filebeat
-#    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
-#    user: root
-#    volumes:
-#      - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
-#      - "../data/elk/certs:/usr/share/filebeat/certs"
-#      - "../data/logs:/usr/share/filebeat/ingest_data"
-#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-#    environment:
-#      - ELASTIC_USER=elastic
-#      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-#      - ELASTIC_HOSTS=https://es01:9200
-#      - KIBANA_HOSTS=http://kibana:5601
-#      - LOGSTASH_HOSTS=http://logstash01:9600
-#    networks:
-#      - log_network
+  #  filebeat:
+  #    hostname: filebeat
+  #    container_name: filebeat
+  #    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
+  #    user: root
+  #    volumes:
+  #      - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+  #      - "../data/elk/certs:/usr/share/filebeat/certs"
+  #      - "../data/logs:/usr/share/filebeat/ingest_data"
+  #      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  #    environment:
+  #      - ELASTIC_USER=elastic
+  #      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+  #      - ELASTIC_HOSTS=https://es01:9200
+  #      - KIBANA_HOSTS=http://kibana:5601
+  #      - LOGSTASH_HOSTS=http://logstash01:9600
+  #    networks:
+  #      - log_network
 
   # postgres: start Postgres, and ensure that data is stored to a mounted volume
   postgres:
@@ -253,6 +271,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4000:4000"
+      - "4500:4500"
+      - "9150:9150"
+      - "8080:8080"
     restart: unless-stopped
 
   # mailhog: a fake smtp server with a web interface
