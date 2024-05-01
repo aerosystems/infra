@@ -195,6 +195,7 @@ services:
     volumes:
       - "../subs-service/.env:/app/.env"
       - "../data/logs:/app/logs"
+      - "./secrets/verifire-396021-0d8b6b8a96b2.json:/app/secrets/verifire-396021-0d8b6b8a96b2.json"
     env_file:
       - ../subs-service/.env
 
