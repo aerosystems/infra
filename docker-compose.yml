@@ -186,15 +186,11 @@ services:
       context: ../subs-service
       dockerfile: Dockerfile
     restart: unless-stopped
-    depends_on:
-      - postgres
     ports:
       - "8089:80"
     expose:
       - "5001"
     volumes:
-      - "../subs-service/.env:/app/.env"
-      - "../data/logs:/app/logs"
       - "./secrets/verifire-396021-0d8b6b8a96b2.json:/app/secrets/verifire-396021-0d8b6b8a96b2.json"
     env_file:
       - ../subs-service/.env
@@ -207,36 +203,14 @@ services:
       context: ../customer-service
       dockerfile: Dockerfile
     restart: unless-stopped
-    depends_on:
-      - postgres
     ports:
       - "8090:80"
     expose:
       - "5001"
     volumes:
-      - "../customer-service/.env:/app/.env"
-      - "../data/logs:/app/logs"
+      - "./secrets/verifire-project-credentials.json:/app/secrets/verifire-project-credentials.json"
     env_file:
       - ../customer-service/.env
-
-  #  filebeat:
-  #    hostname: filebeat
-  #    container_name: filebeat
-  #    image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
-  #    user: root
-  #    volumes:
-  #      - "./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
-  #      - "../data/elk/certs:/usr/share/filebeat/certs"
-  #      - "../data/logs:/usr/share/filebeat/ingest_data"
-  #      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-  #    environment:
-  #      - ELASTIC_USER=elastic
-  #      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-  #      - ELASTIC_HOSTS=https://es01:9200
-  #      - KIBANA_HOSTS=http://kibana:5601
-  #      - LOGSTASH_HOSTS=http://logstash01:9600
-  #    networks:
-  #      - log_network
 
   # postgres: start Postgres, and ensure that data is stored to a mounted volume
   postgres:

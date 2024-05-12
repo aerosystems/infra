@@ -230,6 +230,15 @@ customer: customer-build
 	docker-compose -f ./docker-compose.yml --env-file ./.env start customer-service
 	@echo "customer-service built and started!"
 
+## emulator: rebuilds emulator
+emulator:
+	@echo "Building emulator..."
+	docker-compose -f ./docker-compose.yml --env-file ./.env stop firebase-emulator
+	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f firebase-emulator
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d firebase-emulator
+	docker-compose -f ./docker-compose.yml --env-file ./.env start firebase-emulator
+	@echo "Emulator built!"
+
 ## clean: runs go clean and deletes binaries
 clean:
 	@echo "Cleaning..."
