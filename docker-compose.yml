@@ -63,6 +63,7 @@ services:
     volumes:
       - "../project-service/.env:/app/.env"
       - "../data/logs:/app/logs"
+      - "./secrets/verifire-project-credentials.json:/app/secrets/verifire-project-credentials.json"
     env_file:
       - ../project-service/.env
 
