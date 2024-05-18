@@ -61,7 +61,7 @@ services:
     volumes:
       - "../project-service/.env:/app/.env"
       - "../data/logs:/app/logs"
-      - "./secrets/verifire-project-credentials.json:/app/secrets/verifire-project-credentials.json"
+      - "./secrets/verifire-396021-0d8b6b8a96b2.json:/app/secrets/verifire-396021-0d8b6b8a96b2.json"
     env_file:
       - ../project-service/.env
 
@@ -207,7 +207,7 @@ services:
     expose:
       - "5001"
     volumes:
-      - "./secrets/verifire-project-credentials.json:/app/secrets/verifire-project-credentials.json"
+      - "./secrets/verifire-396021-0d8b6b8a96b2.json:/app/secrets/verifire-396021-0d8b6b8a96b2.json"
     env_file:
       - ../customer-service/.env
 
@@ -245,9 +245,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4000:4000"
-      - "4500:4500"
-      - "9150:9150"
-      - "8080:8080"
     restart: unless-stopped
 
   # mailhog: a fake smtp server with a web interface
