@@ -17,7 +17,7 @@ ADAPTER_BINARY=adapter-service.bin
 ADAPTER_VERSION=1.0.0
 STAT_BINARY=stat-service.bin
 STAT_VERSION=1.0.0
-SUBS_BINARY=subs-service.bin
+SUBS_BINARY=subscription-service.bin
 SUBS_VERSION=1.0.0
 CUSTOMER_BINARY=customer-service.bin
 CUSTOMER_VERSION=1.0.0
@@ -67,7 +67,7 @@ build-dockerfiles: auth-build project-build checkmail-build mail-build lookup-bu
 	docker build -f ../recaptcha-service/Dockerfile -t ${CONTAINER_REPOSITORY}/recaptcha-service:${RECAPTCHA_VERSION} ../
 	docker build -f ../adapter-service/Dockerfile -t ${CONTAINER_REPOSITORY}/adapter-service:${ADAPTER_VERSION} ../
 	docker build -f ../stat-service/Dockerfile -t ${CONTAINER_REPOSITORY}/stat-service:${STAT_VERSION} ../
-	docker build -f ../subs-service/Dockerfile -t ${CONTAINER_REPOSITORY}/subs-service:${SUBS_VERSION} ../
+	docker build -f ../subscription-service/Dockerfile -t ${CONTAINER_REPOSITORY}/subscription-service:${SUBS_VERSION} ../
 	docker build -f ../customer-service/Dockerfile -t ${CONTAINER_REPOSITORY}/customer-service:${CUSTOMER_VERSION} ../
 	@echo "Dockerfiles built!"
 
@@ -119,11 +119,11 @@ stat-build:
 	cd ../stat-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${STAT_BINARY} ./cmd/app
 	@echo "stat-service binary built!"
 
-## subs-build: builds the subs-service binary as a linux executable
+## subs-build: builds the subscription-service binary as a linux executable
 subs-build:
-	@echo "Building subs-service binary.."
-	cd ../subs-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${SUBS_BINARY} ./cmd/app
-	@echo "subs-service binary built!"
+	@echo "Building subscription-service binary.."
+	cd ../subscription-service && env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${SUBS_BINARY} ./cmd/app
+	@echo "subscription-service binary built!"
 
 ## customer-build: builds the customer-service binary as a linux executable
 customer-build:
@@ -212,14 +212,14 @@ stat: stat-build
 	docker-compose -f ./docker-compose.yml --env-file ./.env start stat-service
 	@echo "stat-service built and started!"
 
-## subs: stops subs-service, removes docker image, builds service, and starts it
+## subs: stops subscription-service, removes docker image, builds service, and starts it
 subs: subs-build
-	@echo "Building subs-service docker image..."
-	docker-compose -f ./docker-compose.yml --env-file ./.env stop subs-service
-	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f subs-service
-	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d subs-service
-	docker-compose -f ./docker-compose.yml --env-file ./.env start subs-service
-	@echo "subs-service built and started!"
+	@echo "Building subscription-service docker image..."
+	docker-compose -f ./docker-compose.yml --env-file ./.env stop subscription-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env rm -f subscription-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env up --build -d subscription-service
+	docker-compose -f ./docker-compose.yml --env-file ./.env start subscription-service
+	@echo "subscription-service built and started!"
 
 ## customer: stops customer-service, removes docker image, builds service, and starts it
 customer: customer-build
@@ -258,8 +258,8 @@ clean:
 	@cd ../adapter-service && go clean
 	@cd ../stat-service && rm -f ${STAT_BINARY}
 	@cd ../stat-service && go clean
-	@cd ../subs-service && rm -f ${SUBS_BINARY}
-	@cd ../subs-service && go clean
+	@cd ../subscription-service && rm -f ${SUBS_BINARY}
+	@cd ../subscription-service && go clean
 	@cd ../customer-service && rm -f ${CUSTOMER_BINARY}
 	@cd ../customer-service && go clean
 	@echo "Cleaned!"
@@ -275,7 +275,7 @@ doc:
 	cd ../recaptcha-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../adapter-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../stat-service; swag init -g ./cmd/app/main.go -o ./docs
-	cd ../subs-service; swag init -g ./cmd/app/main.go -o ./docs
+	cd ../subscription-service; swag init -g ./cmd/app/main.go -o ./docs
 	cd ../customer-service; swag init -g ./cmd/app/main.go -o ./docs
 	@echo "Swagger Docs prepared, look at /docs"
 

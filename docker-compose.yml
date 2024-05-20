@@ -177,12 +177,12 @@ services:
     env_file:
       - ../stat-service/.env
 
-  # subs-service - store and retrieve subscriptions
-  subs-service:
-    container_name: subs-service
-    hostname: subs-service
+  # subscription-service - store and retrieve subscriptions
+  subscription-service:
+    container_name: subscription-service
+    hostname: subscription-service
     build:
-      context: ../subs-service
+      context: ../subscription-service
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
@@ -192,7 +192,7 @@ services:
     volumes:
       - "./secrets/verifire-396021-0d8b6b8a96b2.json:/app/secrets/verifire-396021-0d8b6b8a96b2.json"
     env_file:
-      - ../subs-service/.env
+      - ../subscription-service/.env
 
   # customer-service - manage users
   customer-service:
