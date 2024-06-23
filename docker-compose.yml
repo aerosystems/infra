@@ -245,6 +245,7 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4000:4000"
+      - "8080:8080"
     restart: unless-stopped
 
   # mailhog: a fake smtp server with a web interface
