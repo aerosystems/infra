@@ -83,25 +83,25 @@ services:
     env_file:
       - ../checkmail-service/.env
 
-  # mail-service - sends emails
-  mail-service:
-    container_name: mail-service
-    hostname: mail-service
-    build:
-      context: ../mail-service
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - mailhog
-    ports:
-      - "8086:80"
-    expose:
-      - "5001"
-    volumes:
-      - "../mail-service/.env:/app/.env"
-      - "../data/logs:/app/logs"
-    env_file:
-      - ../mail-service/.env
+#  # mail-service - sends emails
+#  mail-service:
+#    container_name: mail-service
+#    hostname: mail-service
+#    build:
+#      context: ../mail-service
+#      dockerfile: Dockerfile
+#    restart: unless-stopped
+#    depends_on:
+#      - mailhog
+#    ports:
+#      - "8086:80"
+#    expose:
+#      - "5001"
+#    volumes:
+#      - "../mail-service/.env:/app/.env"
+#      - "../data/logs:/app/logs"
+#    env_file:
+#      - ../mail-service/.env
 
   # lookup-service - determines email domain type
   lookup-service:
@@ -158,24 +158,24 @@ services:
     env_file:
       - ../adapter-service/.env
 
-  stat-service:
-    hostname: stat-service
-    container_name: stat-service
-    build:
-      context: ../stat-service
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    ports:
-      - "8088:80"
-    volumes:
-      - "../stat-service/.env:/app/.env"
-      - "../data/logs:/app/logs"
-      - "../data/elk/certs/es01:/app/certs"
-    networks:
-      - log_network
-      - default
-    env_file:
-      - ../stat-service/.env
+#  stat-service:
+#    hostname: stat-service
+#    container_name: stat-service
+#    build:
+#      context: ../stat-service
+#      dockerfile: Dockerfile
+#    restart: unless-stopped
+#    ports:
+#      - "8088:80"
+#    volumes:
+#      - "../stat-service/.env:/app/.env"
+#      - "../data/logs:/app/logs"
+#      - "../data/elk/certs/es01:/app/certs"
+#    networks:
+#      - log_network
+#      - default
+#    env_file:
+#      - ../stat-service/.env
 
   # subscription-service - store and retrieve subscriptions
   subscription-service:
@@ -248,11 +248,11 @@ services:
       - "8080:8080"
     restart: unless-stopped
 
-  # mailhog: a fake smtp server with a web interface
-  mailhog:
-    container_name: mailhog
-    hostname: mailhog
-    image: 'mailhog/mailhog:latest'
-    ports:
-      - "8025:8025"
-      - "1025:1025"
+#  # mailhog: a fake smtp server with a web interface
+#  mailhog:
+#    container_name: mailhog
+#    hostname: mailhog
+#    image: 'mailhog/mailhog:latest'
+#    ports:
+#      - "8025:8025"
+#      - "1025:1025"
