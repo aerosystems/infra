@@ -3,48 +3,48 @@ networks:
     driver: bridge
 
 services:
-  # api-gateway - main entry point
-  api-gateway:
-    container_name: api-gateway
-    hostname: api-gateway
-    image: 'nginx:1.21.3-alpine'
-    restart: unless-stopped
-    depends_on:
-      - auth-service
-      - project-service
-      - checkmail-service
-    environment:
-      GW_DOMAIN: ${GW_DOMAIN}
-    ports:
-      - "443:443"
-    volumes:
-      - ../gateway/nginx.conf:/etc/nginx/nginx.conf
-      - ../gateway/api_backends.conf:/etc/nginx/api_backends.conf
-      - ../gateway/api_gateway.conf:/etc/nginx/api_gateway.conf
-      - ../gateway/api_json_errors.conf:/etc/nginx/api_json_errors.conf
-      - ../gateway/cors.conf:/etc/nginx/cors.conf
-      - ../gateway/api_conf.d:/etc/nginx/api_conf.d
-      - ../gateway/conf.d:/etc/nginx/conf.d
-      - ../gateway/certs:/etc/nginx/certs
+#  # api-gateway - main entry point
+#  api-gateway:
+#    container_name: api-gateway
+#    hostname: api-gateway
+#    image: 'nginx:1.21.3-alpine'
+#    restart: unless-stopped
+#    depends_on:
+#      - auth-service
+#      - project-service
+#      - checkmail-service
+#    environment:
+#      GW_DOMAIN: ${GW_DOMAIN}
+#    ports:
+#      - "443:443"
+#    volumes:
+#      - ../gateway/nginx.conf:/etc/nginx/nginx.conf
+#      - ../gateway/api_backends.conf:/etc/nginx/api_backends.conf
+#      - ../gateway/api_gateway.conf:/etc/nginx/api_gateway.conf
+#      - ../gateway/api_json_errors.conf:/etc/nginx/api_json_errors.conf
+#      - ../gateway/cors.conf:/etc/nginx/cors.conf
+#      - ../gateway/api_conf.d:/etc/nginx/api_conf.d
+#      - ../gateway/conf.d:/etc/nginx/conf.d
+#      - ../gateway/certs:/etc/nginx/certs
 
-  # auth-service - handles user auth
-  auth-service:
-    container_name: auth-service
-    hostname: auth-service
-    build:
-      context: ../auth-service
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - postgres
-      - redis
-    ports:
-      - "8081:80"
-    volumes:
-      - "../auth-service/.env:/app/.env"
-      - "../data/logs:/app/logs"
-    env_file:
-      - ../auth-service/.env
+#  # auth-service - handles user auth
+#  auth-service:
+#    container_name: auth-service
+#    hostname: auth-service
+#    build:
+#      context: ../auth-service
+#      dockerfile: Dockerfile
+#    restart: unless-stopped
+#    depends_on:
+#      - postgres
+#      - redis
+#    ports:
+#      - "8081:80"
+#    volumes:
+#      - "../auth-service/.env:/app/.env"
+#      - "../data/logs:/app/logs"
+#    env_file:
+#      - ../auth-service/.env
 
   # project-service - handles user projects
   project-service:
@@ -125,21 +125,21 @@ services:
     env_file:
       - ../lookup-service/.env
 
-  # recaptcha-service - checks reCAPTCHA tokens
-  recaptcha-service:
-    container_name: recaptcha-service
-    hostname: recaptcha-service
-    build:
-      context: ../recaptcha-service
-      dockerfile: Dockerfile
-    restart: unless-stopped
-    ports:
-      - "8085:80"
-    volumes:
-      - "../recaptcha-service/.env:/app/.env"
-      - "../data/logs:/app/logs"
-    env_file:
-      - ../recaptcha-service/.env
+#  # recaptcha-service - checks reCAPTCHA tokens
+#  recaptcha-service:
+#    container_name: recaptcha-service
+#    hostname: recaptcha-service
+#    build:
+#      context: ../recaptcha-service
+#      dockerfile: Dockerfile
+#    restart: unless-stopped
+#    ports:
+#      - "8085:80"
+#    volumes:
+#      - "../recaptcha-service/.env:/app/.env"
+#      - "../data/logs:/app/logs"
+#    env_file:
+#      - ../recaptcha-service/.env
 
   adapter-service:
     hostname: adapter-service
@@ -226,17 +226,17 @@ services:
     volumes:
       - ../data/postgres/:/var/lib/postgresql/data/
 
-  # redis: the redis server
-  redis:
-    container_name: redis
-    hostname: redis
-    image: 'redis:6.2-alpine'
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
-    volumes:
-      - ../data/redis:/data
+#  # redis: the redis server
+#  redis:
+#    container_name: redis
+#    hostname: redis
+#    image: 'redis:6.2-alpine'
+#    restart: unless-stopped
+#    ports:
+#      - "6379:6379"
+#    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+#    volumes:
+#      - ../data/redis:/data
 
   firebase-emulator:
     container_name: firebase-emulator
