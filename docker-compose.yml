@@ -59,8 +59,6 @@ services:
     expose:
       - "5001"
     volumes:
-      - "../project-service/.env:/app/.env"
-      - "../data/logs:/app/logs"
       - "./secrets/verifire-396021-0d8b6b8a96b2.json:/app/secrets/verifire-396021-0d8b6b8a96b2.json"
     env_file:
       - ../project-service/.env
@@ -78,8 +76,7 @@ services:
     ports:
       - "8083:80"
     volumes:
-      - "../checkmail-service/.env:/app/.env"
-      - "../data/logs:/app/logs"
+      - "./secrets/verifire-396021-0d8b6b8a96b2.json:/app/secrets/verifire-396021-0d8b6b8a96b2.json"
     env_file:
       - ../checkmail-service/.env
 
