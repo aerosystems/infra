@@ -74,7 +74,7 @@ services:
     depends_on:
       - postgres
     ports:
-      - "8083:80"
+      - "8083:8080"
     volumes:
       - "./secrets/verifire-396021-0d8b6b8a96b2.json:/app/secrets/verifire-396021-0d8b6b8a96b2.json"
     env_file:
