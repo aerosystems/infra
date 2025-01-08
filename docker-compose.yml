@@ -13,82 +13,91 @@ services:
     restart: unless-stopped
     ports:
       - "8090:8080"
-    expose:
-      - "5001"
     volumes:
       - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
     env_file:
       - ../customer-service/.env
     networks: { default: { aliases: [ "customer-service" ] } }
 
-  # project-service - handles user projects
-  project-service:
-    container_name: project-service
-    hostname: project-service
+  # project-service-http - handles user projects via HTTP
+  project-service-http:
+    container_name: project-service-http
+    hostname: project-service-http
     build:
       context: ../project-service
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
       - "8082:8080"
-    expose:
-      - "5001"
     volumes:
       - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
     env_file:
       - ../project-service/.env
-    networks: { default: { aliases: [ "project-service" ] } }
+    environment:
+      - PORT=8080
+      - PROTO=http
+    networks: { default: { aliases: [ "project-service-http" ] } }
 
-  # checkmail-service - handles domain & emails
-  checkmail-service:
-    container_name: checkmail-service
-    hostname: checkmail-service
+  # project-service-grpc - handles user projects via gRPC
+  project-service-grpc:
+    container_name: project-service-grpc
+    hostname: project-service-grpc
     build:
-      context: ../checkmail-service
+      context: ../project-service
       dockerfile: Dockerfile
     restart: unless-stopped
-    depends_on:
-      - postgres
     ports:
-      - "8083:8080"
+      - "8092:50051"
+    expose:
+      - "50051"
     volumes:
       - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
     env_file:
-      - ../checkmail-service/.env
-    networks: { default: { aliases: [ "checkmail-service" ] } }
+      - ../project-service/.env
+    environment:
+      - PORT=50051
+      - PROTO=grpc
+    networks: { default: { aliases: [ "project-service-grpc" ] } }
 
-  # subscription-service - store and retrieve subscriptions
-  subscription-service:
-    container_name: subscription-service
-    hostname: subscription-service
+  # subscription-service-http - store and retrieve subscriptions via HTTP
+  subscription-service-http:
+    container_name: subscription-service-http
+    hostname: subscription-service-http
     build:
       context: ../subscription-service
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
       - "8089:8080"
-    expose:
-      - "5001"
     volumes:
       - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
     env_file:
       - ../subscription-service/.env
-    networks: { default: { aliases: [ "subscription-service" ] } }
-
-  # postgres: start Postgres, and ensure that data is stored to a mounted volume
-  postgres:
-    container_name: postgres
-    hostname: postgres
-    image: 'postgres:15.2'
-    ports:
-      - "5432:5432"
-    restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      - PORT=8080
+      - PROTO=http
+    networks: { default: { aliases: [ "subscription-service-http" ] } }
+
+  # subscription-service-grpc - store and retrieve subscriptions via gRPC
+  subscription-service-grpc:
+    container_name: subscription-service-grpc
+    hostname: subscription-service-grpc
+    build:
+      context: ../subscription-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8099:50051"
+    expose:
+      - "50051"
     volumes:
-      - ../data/postgres/:/var/lib/postgresql/data/
+      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+    env_file:
+      - ../subscription-service/.env
+    environment:
+      - PORT=50051
+      - PROTO=grpc
+    networks: { default: { aliases: [ "subscription-service-grpc" ] } }
 
   firebase-emulator:
     container_name: firebase-emulator
@@ -99,6 +108,39 @@ services:
       - "4000:4000"
       - "8080:8080"
     restart: unless-stopped
+
+  #  # checkmail-service - handles domain & emails
+  #  checkmail-service:
+  #    container_name: checkmail-service
+  #    hostname: checkmail-service
+  #    build:
+  #      context: ../checkmail-service
+  #      dockerfile: Dockerfile
+  #    restart: unless-stopped
+  #    depends_on:
+  #      - postgres
+  #    ports:
+  #      - "8083:8080"
+  #    volumes:
+  #      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+  #    env_file:
+  #      - ../checkmail-service/.env
+  #    networks: { default: { aliases: [ "checkmail-service" ] } }
+
+  #  # postgres: start Postgres, and ensure that data is stored to a mounted volume
+  #  postgres:
+  #    container_name: postgres
+  #    hostname: postgres
+  #    image: 'postgres:15.2'
+  #    ports:
+  #      - "5432:5432"
+  #    restart: unless-stopped
+  #    environment:
+  #      POSTGRES_USER: ${POSTGRES_USER}
+  #      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #      POSTGRES_DB: ${POSTGRES_DB}
+  #    volumes:
+  #      - ../data/postgres/:/var/lib/postgresql/data/
 
   #  # mailhog: a fake smtp server with a web interface
   #  mailhog:
