@@ -1,0 +1,36 @@
+{
+  "functions": {
+    "predeploy": [
+      "npm --prefix ./functions run lint",
+      "npm --prefix ./functions run build"
+    ],
+    "source": "functions"
+  },
+  "emulators": {
+    "hub": {
+      "host": "0.0.0.0",
+      "port": 4400
+    },
+    "firestore": {
+      "host": "0.0.0.0",
+      "port": 8080
+    },
+    "functions": {
+      "host": "0.0.0.0",
+      "port": 5001
+    },
+    "pubsub": {
+      "host": "0.0.0.0",
+      "port": 8085
+    },
+    "ui": {
+      "enabled": true,
+      "host": "0.0.0.0",
+      "port": 4000
+    },
+    "auth": {
+      "port": 9099,
+      "host": "0.0.0.0"
+    }
+  }
+}

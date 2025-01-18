@@ -1,0 +1,28 @@
+swagger: '2.0'
+info:
+  title: api-gateway
+  description: API Gateway
+  version: 1.0.0
+schemes:
+  - https
+produces:
+  - application/json
+paths:
+  /v1/projects:
+    get:
+      summary: Get projects
+      operationId: v1-projects-get
+      x-google-backend:
+        address: https://project-service-http-244108678816.europe-west1.run.app/v1/projects
+      responses:
+        '200':
+          description: OK
+  /v1/subscriptions:
+    get:
+      summary: Get subscriptions
+      operationId: v1-subscriptions-get
+      x-google-backend:
+        address: https://subscription-service-http-244108678816.europe-west1.run.app/v1/subscriptions
+      responses:
+        '200':
+          description: OK
