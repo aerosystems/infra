@@ -8,8 +8,7 @@ RUN apt-get update -y && \
     apt-get install -y openjdk-17-jdk bash && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    npm install -g firebase-tools && \
-    npm --prefix /app/functions ci
+    npm install -g firebase-tools
 
 # Ensure the entrypoint script is in place and executable
 RUN echo '#!/bin/sh' > /app/entrypoint.sh && \
