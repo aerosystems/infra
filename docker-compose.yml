@@ -48,8 +48,6 @@ services:
     restart: unless-stopped
     ports:
       - "8092:50051"
-    expose:
-      - "50051"
     volumes:
       - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
     env_file:
@@ -88,8 +86,6 @@ services:
     restart: unless-stopped
     ports:
       - "8099:50051"
-    expose:
-      - "50051"
     volumes:
       - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
     env_file:
@@ -131,7 +127,7 @@ services:
     depends_on:
       - postgres
     ports:
-      - "8093:8080"
+      - "8093:50051"
     volumes:
       - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
     env_file:
@@ -140,6 +136,48 @@ services:
       - PORT=50051
       - PROTO=grpc
     networks: { default: { aliases: [ "checkmail-service-grpc" ] } }
+
+  # lookup-service-http - determines email domain type via HTTP
+  lookup-service-http:
+    container_name: lookup-service-http
+    hostname: lookup-service-http
+    build:
+      context: ../lookup-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "8084:8080"
+    volumes:
+      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+    env_file:
+      - ../lookup-service/.env
+    environment:
+      - PORT=8080
+      - PROTO=http
+    networks: { default: { aliases: [ "lookup-service-http" ] } }
+
+  # lookup-service-grpc - determines email domain type via gRPC
+  lookup-service-grpc:
+    container_name: lookup-service-grpc
+    hostname: lookup-service-grpc
+    build:
+      context: ../lookup-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "8094:50051"
+    volumes:
+      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+    env_file:
+      - ../lookup-service/.env
+    environment:
+      - PORT=50051
+      - PROTO=grpc
+    networks: { default: { aliases: [ "lookup-service-grpc" ] } }
 
   #  stat-service:
   #    hostname: stat-service
@@ -189,35 +227,11 @@ services:
   #      - mailhog
   #    ports:
   #      - "8086:80"
-  #    expose:
-  #      - "5001"
   #    volumes:
   #      - "../mail-service/.env:/app/.env"
   #      - "../data/logs:/app/logs"
   #    env_file:
   #      - ../mail-service/.env
-
-  #  # lookup-service - determines email domain type
-  #  lookup-service:
-  #    container_name: lookup-service
-  #    hostname: lookup-service
-  #    build:
-  #      context: ../lookup-service
-  #      dockerfile: Dockerfile
-  #    #      dockerfile: Dockerfile.debug
-  #    restart: unless-stopped
-  #    depends_on:
-  #      - postgres
-  #    ports:
-  #      - "8084:80"
-  #    #      - "40000:40000"
-  #    expose:
-  #      - "5001"
-  #    volumes:
-  #      - "../lookup-service/.env:/app/.env"
-  #      - "../data/logs:/app/logs"
-  #    env_file:
-  #      - ../lookup-service/.env
 
   #  # mailhog: a fake smtp server with a web interface
   #  mailhog:
