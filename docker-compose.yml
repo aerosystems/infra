@@ -140,6 +140,25 @@ services:
       - PROTO=grpc
     networks: { default: { aliases: [ "checkmail-service-grpc" ] } }
 
+  # checkmail-service-tg - check if an email/domain is disposable via HTTP for Telegram Webhook
+  checkmail-service-tg:
+    container_name: checkmail-service-tg
+    hostname: checkmail-service-tg
+    build:
+      context: ../checkmail-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    volumes:
+      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+      - "./secrets/tg:/app/secrets/tg"
+    env_file:
+      - ../checkmail-service/.env
+    environment:
+      - PROTO=tg
+    networks: { default: { aliases: [ "checkmail-service-http" ] } }
+
   # lookup-service-http - determines email domain type via HTTP
   lookup-service-http:
     container_name: lookup-service-http
@@ -266,7 +285,7 @@ services:
     ports:
       - "5432:5432"
     restart: unless-stopped
-    command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
+    command: [ "postgres", "-c", "log_statement=all", "-c", "log_destination=stderr" ]
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
