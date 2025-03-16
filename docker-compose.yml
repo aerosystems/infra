@@ -257,9 +257,7 @@ services:
       - "9099:9099"
     restart: unless-stopped
     volumes:
-      - ./data/firebase-emulator/:/var/lib/firebase-emulator/
-    command: >
-      firebase emulators:start --import /var/lib/firebase-emulator --export-on-exit /var/lib/firebase-emulator
+      - ./data/firebase-emulator:/var/lib/firebase-emulator
 
   postgres:
     container_name: postgres

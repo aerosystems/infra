@@ -10,9 +10,6 @@ RUN apt-get update -y && \
     rm -rf /var/lib/apt/lists/* && \
     npm install -g firebase-tools
 
-# Ensure the entrypoint script is in place and executable
-RUN echo '#!/bin/sh' > /app/entrypoint.sh && \
-    echo 'firebase emulators:start' >> /app/entrypoint.sh && \
-    chmod +x /app/entrypoint.sh
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["firebase", "emulators:start", "--import", "/var/lib/firebase-emulator/data", "--export-on-exit", "/var/lib/firebase-emulator/data"]
+
