@@ -14,7 +14,7 @@ services:
     ports:
       - "8090:8080"
     volumes:
-      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+      - "./secrets/verifire-service-account.json:/app/secrets/verifire-service-account.json"
     env_file:
       - ../customer-service/.env
     environment:
@@ -33,7 +33,7 @@ services:
     ports:
       - "8082:8080"
     volumes:
-      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+      - "./secrets/verifire-service-account.json:/app/secrets/verifire-service-account.json"
     env_file:
       - ../project-service/.env
     environment:
@@ -52,7 +52,7 @@ services:
     ports:
       - "8092:50051"
     volumes:
-      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+      - "./secrets/verifire-service-account.json:/app/secrets/verifire-service-account.json"
     env_file:
       - ../project-service/.env
     environment:
@@ -71,7 +71,7 @@ services:
     ports:
       - "8089:8080"
     volumes:
-      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+      - "./secrets/verifire-service-account.json:/app/secrets/verifire-service-account.json"
     env_file:
       - ../subscription-service/.env
     environment:
@@ -90,7 +90,7 @@ services:
     ports:
       - "8099:50051"
     volumes:
-      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+      - "./secrets/verifire-service-account.json:/app/secrets/verifire-service-account.json"
     env_file:
       - ../subscription-service/.env
     environment:
@@ -111,7 +111,7 @@ services:
     ports:
       - "8083:8080"
     volumes:
-      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+      - "./secrets/verifire-service-account.json:/app/secrets/verifire-service-account.json"
     env_file:
       - ../checkmail-service/.env
     environment:
@@ -132,7 +132,7 @@ services:
     ports:
       - "8093:50051"
     volumes:
-      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+      - "./secrets/verifire-service-account.json:/app/secrets/verifire-service-account.json"
     env_file:
       - ../checkmail-service/.env
     environment:
@@ -151,7 +151,7 @@ services:
     depends_on:
       - postgres
     volumes:
-      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+      - "./secrets/verifire-service-account.json:/app/secrets/verifire-service-account.json"
       - "./secrets/tg:/app/secrets/tg"
     env_file:
       - ../checkmail-service/.env
@@ -172,7 +172,7 @@ services:
     ports:
       - "8084:8080"
     volumes:
-      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+      - "./secrets/verifire-service-account.json:/app/secrets/verifire-service-account.json"
     env_file:
       - ../lookup-service/.env
     environment:
@@ -193,7 +193,7 @@ services:
     ports:
       - "8094:50051"
     volumes:
-      - "./secrets/verifire-60d1b-3a7b22c9842d.json:/app/secrets/verifire-60d1b-3a7b22c9842d.json"
+      - "./secrets/verifire-service-account.json:/app/secrets/verifire-service-account.json"
     env_file:
       - ../lookup-service/.env
     environment:
